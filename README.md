@@ -9,7 +9,6 @@
 - Robert Wojtaś
 - Jakub Sikora
 
-
 **Treść zadania:**  
 Konkretyzacja tego zadania wymaga:
 - ustalenia atrybutów wykorzystywanych do grupowania (traktowanych jako obserwowalne) oraz ewentualnie zbioru atrybutów, na temat których będzie prowadzone wnioskowanie na podstawie przynależności do grup (traktowanych jako ukryte),
@@ -45,3 +44,12 @@ Opóźnienie w oddaniu założeń wstępnych nie przekraczające jednego tygodni
 Po upływie jednego tygodnia od terminu lub po zakończeniu zajęć dydaktycznych w semestrze kod i dokumentacja nie będą przyjmowane, z wyjątkiem uzasadnionych przypadków losowych. Opóźnienie w oddaniu któregokolwiek z produktów końcowych projektu (kodu źródłowego lub dokumentacji) nieprzekraczające jednego tygodnia powoduje przemnożenie uzyskanych ocen za realizację projektu przez współczynnik 0.8 (w przypadku braku założeń wstępnych łączny mnożnik wyniesie 0.8*0.8=0.64).
 
 Przy ustalaniu numerów tygodni, o których mowa wyżej, uwzględnia się wyłącznie tygodnie, w których zgodnie z obowiązującym kalendarzem zajęć odbywa się wykład (tzn. pomijane są tygodnie, w których dzień wykładu jest dniem wolnym od zajęć dydaktycznych lub w dniu wykładu realizowane są zajęcia według rozkładu z innego dnia). Oznacza to w szczególności, że przez ostatni tydzień semestru rozumiany jest tydzień, w którym odbywa się ostatni wykład z ZUM, a przez przedostatni tydzień semestru -- tydzień, w którym odbywa się przedostatni wykład z ZUM.
+
+**Dane:**  
+link do [kaggle](https://www.kaggle.com/karangadiya/fifa19) 
+
+**Wnioski po pierwszym spotkaniu:**  
+- obserwowalne zwykłe atrybuty (odrzucamy overall na konkretnej pozycji), próbujemy pogrupować zawodników na podobnych pozycjach, 
+- usunięcie niepotrzebnych i nadmiarowych (overall na konkretnej pozycji) atrybutów, uzupełnienie brakujących danych i skalowanie,
+- możemy pokombinować z atrybutami opisującymi fizyczność zawodnika np BMI,
+- na następnym spotkaniu wybierzemy algorytmy i opiszemy parametry z nimi związane oraz sformalizujemy cel/hipotezę.
