@@ -45,13 +45,57 @@ robert.wojtas.stud@pw.edu.pl, jakub.sikora2.stud@pw.edu.pl
 \label{sec:cel-projektu}
 Celem projektu będzie zbadanie użyteczności algorytmów grupowania w~zadaniu dobierania optymalnej pozycji piłkarzy z~gry FIFA~19 na boisku. Umiejętności poszczególnych zawodników są opisane za pomocą szeregu parametrów, które mają za zadanie obrazować zdolności gry w~ataku, pomocy i~obronie. Zadaniem algorytmu grupowania będzie połączenie w~grupy zawodników o~podobnych umiejętnościach, tak aby na tej podstawie móc wnioskować o~ich optymalnej pozycji.
 
-\section{Charakterystyka zbioru danych}
+\section{Zbiór danych}
 \label{sec:dane}
-\todo{opisać dane~\cite{fifa-dataset}, jakie są kolumny, co wywalimy a co zostawimy, jakie atrybuty będą obserwowalne a jakie ukryte}
 
-\todo{określić zakres przygotowania danych}
+\subsection{Charakterystka zbioru danych}
+\label{subsec:charakterystka}
 
-\todo{wskazać możliwości zdefiniowania nowych atrybutów}
+W~projekcie wykorzystane zostaną dane ze zbioru \emph{FIFA 19 Complete Player Dataset}~\cite{fifa-dataset} z~serwisu \url{kaggle.com}. Każdy zawodnik posiada ponad 70 użytecznych atrybutów opisujących jego umiejętności gry w~piłkę nożną. Wśród nich znajdują się atrybuty opisujące m.in. kontrolę piłki, przyspieszenie czy celność strzałów z~dystansu. 
+
+Większość atrybutów jest opisana za pomocą wartości całkowitych z~zakresu $[0, 99]$. Niektóre atrybuty zostały opisane liczbą całkowitą z~zakresu $[0,5]$. W~zestawie danych, pojawiły się atrybuty ciągłe opisujące wartość zawodnika, jego tygodniówkę, wzrost, wiek i~wagę oraz atrybuty kategoryczne opisujące preferowaną nogę (lewa lub prawa), typ budowy ciała oraz jego główną pozycję.
+
+Każdemu zawodnikowi przypisany jest atrybut kategoryczny opisujący główną pozycję na boisku oraz 26 wskaźników numerycznych, określających jak dobry jest dany zawodnik na poszczególnych pozycjach.
+
+Dodatkowo, zbiór danych został uzupełniony o~metadane opisujące samego zawodnika, takie jak numer na koszulce, nazwisko, link do zdjęcia, drużyna, narodowość czy międzynarodową reputację. 
+
+\todo{ja bym tu wstawił jakiś wykresik lub kilka tak aby zobrazować jak ten dane wyglądają, może jakiś rozkład albo coś takiego}
+
+\subsection{Przygotowanie atrybutów}
+\label{subsec:atrybuty}
+
+W~procesie przygotowania danych, należy zastanowić się które atrybuty należy pozostawić a które powinny zostać usunięte. Oprócz tego, wykorzystując wiedzę ekspercką na temat piłki nożnej można zastanowić się nad generacją nowych atrybutów. Kolejnym krokiem będzie transformacja danych do~postaci użytecznej do przeprowadzenia wnioskowania, poprzez uzupełnienie brakujących danych, normalizację i~zamianę atrybutów kategorycznych na numeryczne. Ostatecznie, należy określić które z~atrybutów będą traktowane jako obserwowalne, a~które jako ukryte.
+
+Do zbioru danych dodane zostaną dodatkowe atrybuty wygenerowane na podstawie już istniejących oraz wiedzy eksperckiej. Takimi atrybutami mogą być wygenerowane cechy fizyczne przykładowo stosunek wagi do wzrostu lub stosunek przyspieszenia do prędkości maksymalnej.
+
+Ze zbioru definitywnie należy usunąć atrybuty opisowe określające nieinteresujące nas cechy takie jak narodowość, aktualna drużyna, reputacja czy nazwisko. Dodatkowo, ze zbioru danych usunięte zostaną atrybuty opisujące umiejętność gry danego zawodnika na danej pozycji, ponieważ taka informacja znacząco upraszcza zadanie i~mija się z~celem projektu. W~przypadku pozostałych atrybutów należy przeprowadzić analizę korelacyjną, tak aby moć stwierdzić które atrybuty nie wnoszą dodatkowej informacji.
+
+Jako atrybut ukryty, potraktowana zostania optymalna pozycja na boisku. W~celu przeprowadzenia analizy poprawności badanego algorytmu grupowania, zakładamy że pozycja na boisku zapisana w~zbiorze danych jest jego rzeczywistą optymalną pozycją. Atrybut ten jest niezwykle ciekawy do analizy, ponieważ można go analizować na dwóch poziomach:
+
+\begin{itemize}
+    \item na poziomie ogólnym 
+        \begin{itemize}
+            \item bramkarz,
+            \item obrońca,
+            \item pomocnik,
+            \item napastnik,
+        \end{itemize}
+    \item na poziomie szczegółowym:
+    \begin{itemize}
+        \item bramkarz,
+        \item środkowy obrońca, 
+        \item lewy/prawy boczny obrońca
+        \item lewy/prawy wahadłowy,
+        \item pomocnik ofensywny,
+        \item pomocnik zbalansowany,
+        \item pomocnik defensywny,
+        \item napastnik,
+        \item lewy/prawy skrzydłowy.
+    \end{itemize}
+\end{itemize}
+
+Oprócz tego, w~zależności od wyników grupowania, można spróbować zdefiniować bardziej wyrafinowane pozycje m.in.: 
+\emph{mezzala}, \emph{mediano}, \emph{trequartista} czy libero.
 
 \section{Badane algorytmy}
 \label{sec:algorytmy}
@@ -60,6 +104,7 @@ Celem projektu będzie zbadanie użyteczności algorytmów grupowania w~zadaniu 
 \todo{wybrać algorytmy grupowania i wskazać miary \textbf{niepodobieństwa} przykładów}
 
 \todo{wskazać parametry wymagające strojenia}
+\todo{plan badań}
 
 \section{Miary jakości}
 \label{sec:miary-jakosci}
