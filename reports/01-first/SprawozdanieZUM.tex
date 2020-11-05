@@ -1,0 +1,72 @@
+\documentclass{article}
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
+
+\usepackage{../ZUMreport}
+\usepackage{times}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{polski}
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{luainputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{booktabs}
+\usepackage{subfig}
+
+\urlstyle{same}
+	
+\title{Zaawansowane uczenie maszynowe\\ Założenia wstępne projektu}
+
+\author{
+Robert Wojtaś, Jakub Sikora
+\affiliations
+numery albumów: xxxxxx, 283418 \\
+\emails
+robert.wojtas.stud@pw.edu.pl, jakub.sikora2.stud@pw.edu.pl
+}
+
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{TO DO:} #1}}
+
+\begin{document}
+\maketitle
+
+\section{Cel projektu}
+\label{sec:cel-projektu}
+Celem projektu będzie zbadanie użyteczności algorytmów grupowania w~zadaniu dobierania optymalnej pozycji piłkarzy na boisku, na podstawie jego umiejętności. Umiejętności poszczególnych zawodników są opisane za pomocą szeregu sta
+
+\section{Charakterystyka zbioru danych}
+\label{sec:dane}
+\todo{opisać dane~\cite{fifa-dataset}, jakie są kolumny, co wywalimy a co zostawimy, jakie atrybuty będą obserwowalne a jakie ukryte}
+
+\todo{określić zakres przygotowania danych}
+
+\todo{wskazać możliwości zdefiniowania nowych atrybutów}
+
+\section{Badane algorytmy}
+\label{sec:algorytmy}
+\todo{ustalić kryteria lub algorytmy selekcji atrybutów obserwowalnych}
+
+\todo{wybrać algorytmy grupowania i wskazać miary \textbf{niepodobieństwa} przykładów}
+
+\todo{wskazać parametry wymagające strojenia}
+
+\section{Miary jakości}
+\label{sec:miary-jakosci}
+\todo{ustalić procedury i kryteria oceny jakości}
+
+\section{Otwarte kwestie}
+\label{sec:otwarte-kwestie}
+\todo{do zostawienia sposób opisu grup i charakteryzowania ich specyfiki na podstawie rozkładu wartości atrybutów}
+
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
+
+\end{document}
