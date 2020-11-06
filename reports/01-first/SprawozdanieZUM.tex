@@ -20,6 +20,9 @@
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{subfig}
+\usepackage{pgfplots}
+\usepackage{paracol}
+\usepackage{gensymb}
 
 \urlstyle{same}
 	
@@ -59,16 +62,57 @@ Każdemu zawodnikowi przypisany jest atrybut kategoryczny opisujący główną p
 
 Dodatkowo, zbiór danych został uzupełniony o~metadane opisujące samego zawodnika, takie jak numer na koszulce, nazwisko, link do zdjęcia, drużyna, narodowość czy międzynarodową reputację. 
 
-\todo{ja bym tu wstawił jakiś wykresik lub kilka tak aby zobrazować jak ten dane wyglądają, może jakiś rozkład albo coś takiego}
+\begin{figure}[t]
+    \centering    
+    \begin{tabular}{cc}
+    \subfloat[\emph{Short Passing}]{
+        \begin{tikzpicture}[thick, scale=0.4]
+            \Huge
+            \begin{axis}[ymin=0, area style]
+                \addplot+[ybar interval,mark=no] plot coordinates { (0, 0) (5, 3) (10, 53) (15, 242) (20, 485) (25, 632) (30, 465) (35, 397) (40, 503) (45, 766) (50, 1350) (55, 2408) (60, 3553) (65, 3496) (70, 2309) (75, 1084) (80, 336) (85, 65) (90, 12) (95, 0) };
+            \end{axis}
+        \end{tikzpicture}
+    } &
+    \subfloat[\emph{Strength}]{
+        \begin{tikzpicture}[thick, scale=0.4]
+            \Huge
+            \begin{axis}[ymin=0, area style]
+                \addplot+[ybar interval,mark=no] plot coordinates { (0, 0) (5, 0) (10, 0) (15, 1) (20, 2) (25, 40) (30, 301) (35, 354) (40, 618) (45, 800) (50, 1121) (55, 2015) (60, 2631) (65, 3093) (70, 2810) (75, 2354) (80, 1182) (85, 539) (90, 294) (95, 4) };
+            \end{axis}
+        \end{tikzpicture}    
+    } \\
+    \subfloat[\emph{Agility}]{
+        \begin{tikzpicture}[thick, scale=0.4]
+            \Huge
+            \begin{axis}[ymin=0, area style]
+                \addplot+[ybar interval,mark=no] plot coordinates { (0, 0) (5, 0) (10, 1) (15, 11) (20, 108) (25, 201) (30, 682) (35, 667) (40, 639) (45, 805) (50, 1156) (55, 1813) (60, 2308) (65, 2770) (70, 2734) (75, 2216) (80, 1116) (85, 607) (90, 320) (95, 5) };
+            \end{axis}
+        \end{tikzpicture}
+    } &
+    \subfloat[\emph{GK Positioning}]{
+        \begin{tikzpicture}[thick, scale=0.4]
+            \Huge
+            \begin{axis}[ymin=0, area style, ytick={0, 2000, 5000, 8000}]
+                \addplot+[ybar interval, mark=no] plot coordinates { (0, 81) (5, 6337) (10, 7876) (15, 1831) (20, 4) (25, 1) (30, 3) (35, 3) (40, 31) (45, 88) (50, 227) (55, 326) (60, 460) (65, 450) (70, 251) (75, 127) (80, 51) (85, 11) (90, 1) (95, 0) };
+            \end{axis}
+        \end{tikzpicture}
+    } \\
+
+    \end{tabular}
+    \caption{Przykładowe rozkłady wartości atrybutów z~podanego zbioru danych}
+    \label{fig:rozklady-atrybutow}
+\end{figure}
+
+Na rysunku~\ref{fig:rozklady-atrybutow} zostały zaprezentowane przykładowe rozkłady wartości badanych atrybutów. W~głównej mierze, są to rozkłady normalne lub gruboogonowe. Ciekawy rozkład mają atrybuty opisujące umiejętności bramkarskie. Z~racji nietypowej specyfiki tej pozycji, atrybuty te mają rozkład dwumodalny. Wysoki lewy pik rozkładu opisuje zawodników z~pola, których umiejętności bramkarskie są niewielkie ale jest ich zdecydowanie więcej. Prawy niewielki pik opisuje rzeczywistych bramkarzy, którzy mają niewątpliwie większe umiejętności, jednak jest ich wyraźnie mniej. Obecność bramkarzy w~zestawie danych jest również jednym z~powodów dla którego część rozkładów ma gruby ogon po lewej stronie. 
 
 \subsection{Przygotowanie atrybutów}
 \label{subsec:atrybuty}
 
-W~procesie przygotowania danych, należy zastanowić się które atrybuty należy pozostawić a które powinny zostać usunięte. Oprócz tego, wykorzystując wiedzę ekspercką na temat piłki nożnej można zastanowić się nad generacją nowych atrybutów. Kolejnym krokiem będzie transformacja danych do~postaci użytecznej do przeprowadzenia wnioskowania, poprzez uzupełnienie brakujących danych, normalizację i~zamianę atrybutów kategorycznych na numeryczne. Ostatecznie, należy określić które z~atrybutów będą traktowane jako obserwowalne, a~które jako ukryte.
+W~procesie przygotowania danych, należy zastanowić się które atrybuty należy pozostawić a które powinny zostać usunięte. Oprócz tego, wykorzystując wiedzę ekspercką na temat piłki nożnej można zastanowić się nad generacją nowych atrybutów. Kolejnym krokiem będzie transformacja danych do~postaci użytecznej do przeprowadzenia wnioskowania, poprzez uzupełnienie brakujących danych, skalowanie, normalizację i~zamianę atrybutów kategorycznych na numeryczne. Ostatecznie, należy określić które z~atrybutów będą traktowane jako obserwowalne, a~które jako ukryte.
 
 Do zbioru danych dodane zostaną dodatkowe atrybuty wygenerowane na podstawie już istniejących oraz wiedzy eksperckiej. Takimi atrybutami mogą być wygenerowane cechy fizyczne przykładowo stosunek wagi do wzrostu lub stosunek przyspieszenia do prędkości maksymalnej.
 
-Ze zbioru definitywnie należy usunąć atrybuty opisowe określające nieinteresujące nas cechy takie jak narodowość, aktualna drużyna, reputacja czy nazwisko. Dodatkowo, ze zbioru danych usunięte zostaną atrybuty opisujące umiejętność gry danego zawodnika na danej pozycji, ponieważ taka informacja znacząco upraszcza zadanie i~mija się z~celem projektu. W~przypadku pozostałych atrybutów należy przeprowadzić analizę korelacyjną, tak aby moć stwierdzić które atrybuty nie wnoszą dodatkowej informacji.
+Ze zbioru definitywnie należy usunąć atrybuty opisowe określające nieinteresujące nas cechy takie jak narodowość, aktualna drużyna, reputacja czy nazwisko. Dodatkowo, ze zbioru danych usunięte zostaną atrybuty opisujące umiejętność gry danego zawodnika na danej pozycji, ponieważ taka informacja znacząco upraszcza zadanie i~mija się z~celem projektu. W~przypadku pozostałych atrybutów należy przeprowadzić analizę korelacyjną, tak aby moć stwierdzić które atrybuty nie wnoszą dodatkowej informacji. Ostatecznie, aby móc grupować zawodników grających na podobnych pozycjach lecz o~różnych poziomiach umiejętności, wartości atrybutów zostaną przeskalowane względem ich średniej wartości.  
 
 Jako atrybut ukryty, potraktowana zostania optymalna pozycja na boisku. W~celu przeprowadzenia analizy poprawności badanego algorytmu grupowania, zakładamy że pozycja na boisku zapisana w~zbiorze danych jest jego rzeczywistą optymalną pozycją. Atrybut ten jest niezwykle ciekawy do analizy, ponieważ można go analizować na dwóch poziomach:
 
