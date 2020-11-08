@@ -131,7 +131,7 @@ Jako atrybut ukryty, potraktowana zostania optymalna pozycja na boisku. W~celu p
         \item lewy/prawy boczny obrońca
         \item lewy/prawy wahadłowy,
         \item pomocnik ofensywny,
-        \item pomocnik zbalansowany,
+        \item lewy/środkowy/prawy pomocnik,
         \item pomocnik defensywny,
         \item napastnik,
         \item lewy/prawy skrzydłowy.
@@ -143,6 +143,18 @@ Oprócz tego, w~zależności od wyników grupowania, można spróbować zdefinio
 
 \section{Badane algorytmy}
 \label{sec:algorytmy}
+
+\subsection{Algorytm k-średnich}
+\label{sbsec:k-srednie}
+Celem algorytmu $k$-średnich jest pogrupowanie danych na $k$ grup w~taki sposób, aby zminimalizować sumę kwadratów odległości punktów od wyznaczonych centroidów (środków) grup. W~języku R, algorytm ten można wywołać za pomocą polecenia \texttt{kmeans}. 
+
+Domyślnie polecenie \texttt{kmeans} do znalezienia centroidów korzysta z~metody Hartigana-Wonga, jednak możliwa jest zamiana leżącego u~podstaw algorytmu na algorytm MacQueena lub Lloyda-Forgyego.
+
+Głównym parametrem algorytmu $k$-średnich jest liczba szukanych grup $k$. Liczbę tą podajemy $a priori$, przed uruchomieniem algorytmu. Jednym ze sposobów na odpowiedni dobór parametru $k$ jest przeszukiwanie zupełne w~rozsądnie dobranym przedziale i~znalezienie takiej wartości, przy której wykres całkowitej sumy kwadratów odległości w~zbiorze danych ulega wypłaszczeniu.
+
+Największym problemem algorytmu $k$-średnich jest dobór początkowego podziału na grupy. Możliwymi sposobami są losowy wybór $k$ przykładów ze zbioru danych lub ręczne podanie zbioru centroidów początkowych.
+
+
 \todo{ustalić kryteria lub algorytmy selekcji atrybutów obserwowalnych}
 
 \todo{wybrać algorytmy grupowania i wskazać miary \textbf{niepodobieństwa} przykładów}
