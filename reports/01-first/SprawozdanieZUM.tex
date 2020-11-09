@@ -31,12 +31,14 @@
 \author{
 Robert Wojtaś, Jakub Sikora
 \affiliations
-numery albumów: xxxxxx, 283418 \\
+numery albumów: 283234, 283418 \\
 \emails
 robert.wojtas.stud@pw.edu.pl, jakub.sikora2.stud@pw.edu.pl
 }
 
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{TO DO:} #1}}
+\newcommand{\jsc}[1]{\textcolor{blue}{\textbf{JS:} #1}}
+\newcommand{\rwc}[1]{\textcolor{green}{\textbf{RW:} #1}}
 
 \begin{document}
 \maketitle
@@ -145,14 +147,55 @@ Oprócz tego, w~zależności od wyników grupowania, można spróbować zdefinio
 \label{sec:algorytmy}
 
 \subsection{Algorytm k-średnich}
-\label{sbsec:k-srednie}
+\label{subsec:kmeans}
 Celem algorytmu $k$-średnich jest pogrupowanie danych na $k$ grup w~taki sposób, aby zminimalizować sumę kwadratów odległości punktów od wyznaczonych centroidów (środków) grup. W~języku R, algorytm ten można wywołać za pomocą polecenia \texttt{kmeans}. 
+
+W~pierwszym kroku algorytmu należy dobrać liczbę poszukiwanych grup oraz przyporządkować w~sposób losowy wszystkie obserwacje do grup. Następnie, w~$i$-tym kroku należy obliczyć położenie centroidu dla każdej grupy i~dla każdego punktu zaktualizować przynależności do grupy. Algorytm kończy się gdy w~danym kroku nie została zmieniona żadna przynależność lub przekroczono maksymalną liczbę kroków.
 
 Domyślnie polecenie \texttt{kmeans} do znalezienia centroidów korzysta z~metody Hartigana-Wonga, jednak możliwa jest zamiana leżącego u~podstaw algorytmu na algorytm MacQueena lub Lloyda-Forgyego.
 
 Głównym parametrem algorytmu $k$-średnich jest liczba szukanych grup $k$. Liczbę tą podajemy $a priori$, przed uruchomieniem algorytmu. Jednym ze sposobów na odpowiedni dobór parametru $k$ jest przeszukiwanie zupełne w~rozsądnie dobranym przedziale i~znalezienie takiej wartości, przy której wykres całkowitej sumy kwadratów odległości w~zbiorze danych ulega wypłaszczeniu.
 
-Największym problemem algorytmu $k$-średnich jest dobór początkowego podziału na grupy. Możliwymi sposobami są losowy wybór $k$ przykładów ze zbioru danych lub ręczne podanie zbioru centroidów początkowych.
+Największym problemem algorytmu $k$-średnich jest dobór początkowego podziału na grupy. Możliwymi sposobami są losowy wybór $k$ 
+przykładów ze zbioru danych lub ręczne podanie zbioru centroidów początkowych.
+
+\subsection{Aglomeracyjny algorytm grupowania hierarchicznego}
+\label{subsec:hierarchical}
+\jsc{tutaj Robercik opisz co masz}
+
+
+\subsection{Algorytmy grupowania rozmytego}
+\label{subsec:fuzzy}
+Algorytmy grupowania rozmytego bazują na założeniu że pojedyncza obserwacja może równocześnie należeć do wielu grup. To jak bardzo przykład należy do danej grupy $v$, opisuje \emph{funkcja przynależności} $\mu_{v}(x)$, która może przyjmować wartości z~przedziału $[0,1]$. Dla pojedynczej obserwacji $x$ spełnione są następujące własności:
+
+\begin{equation}
+    \sum_{v=1}^{k} \mu_{v}(x)    
+\end{equation}
+
+\begin{equation}
+    \forall{v} \quad \mu_{v}(x) \geq 0     
+\end{equation}
+
+Podejście rozmyte może potencjalnie dać więcej korzyści, biorąc pod uwagę temat projektu. W~nowoczesnym futbolu, co raz częściej możemy spotkać się z~sytuacją w~której zawodnicy muszą umieć grać na kilku (jak nie wszystkich) pozycjach równocześnie.
+
+W~projekcie porównamy działanie dwóch algorytmów rozmytego grupowania: fuzzy C-means oraz FANNY.
+
+Podstawowym algorytmem grupowania rozmytego jest rozszerzenie algorytmu $k$-średnich na zbiory rozmyte, znany w~literaturze jako rozmyte $k$-średnich lub fuzzy C-means.
+
+Algorytm ten nie różni się wiele od wersji oryginalnej. Jedyną różnicą jest zmiana sposobu określania przynależności do grupy, zamiast szukania najbliższej grupy, obliczamy przynależność do wszystkich grup równocześnie. W~pierwszym kroku algorytmu należy dobrać liczbę poszukiwanych grup oraz przyporządkować w~sposób losowy początkowe wartości funkcji przynależności do wszystkich grup. Następnie, w~$i$-tym kroku należy obliczyć położenie centroidu dla każdej grupy, a~dalej dla każdego punktu zaktualizować funkcje przynależności do wszytkich grup. Algorytm kończy działanie w~momencie gdy wartości funkcji przynależności zmieniły się o~wartość mniejszą niż $\epsilon$ lub osiągnięta została maksymalna liczba kroków.
+
+Algorytm rozmytych $k$-średnich został zaimplementowany w~pakiecie \texttt{e1017} jako funkcja \texttt{cmeans}. Parametrami wymagającymi strojenia jest liczba grup, funkcja odległości, maksymalna liczba iteracji oraz stopień rozmycia.
+
+Drugim badanym przez nas algorytmem będzie algorymt FANNY opracowany przez Kaufmana i~Rousseeuwa~\cite{kaufman2009finding} a~rozszerzony przez Maechlera. Algorytm ten minimalizuje następującą funkcję celu:
+
+\begin{equation}
+    \sum_{v=1}^{k} \frac{\sum_{i=1}^{n}\sum_{j=1}^{n} \mu^{r}_{v}(x_{i}) \mu^{r}_{v}(x_{j}) d(x_{i}, x_{j})}{2 \sum_{j=1}^{n} \mu^{r}_{v}(x_{j})} 
+\end{equation}
+
+gdzie~$n$ oznacza liczbę obserwacji w~zbiorze danych, $k$~jest liczbą grup, $r$~jest \emph{wykładnikiem przynależności}, natomiast~$d(x_{i}, x_{j})$ jest wybraną funkcją niepodobieństwa przykładów~$x_{i}$~i~$x_{j}$.
+
+
+Algorytm ten został zaimplementowany w~pakiecie \texttt{cluster} jako funkcja \texttt{fanny}. Parametrami tej funkcji są: liczba grup, wykładnik przynależności, funkcja odległości oraz maksymalna liczba iteracji.
 
 
 \todo{ustalić kryteria lub algorytmy selekcji atrybutów obserwowalnych}
@@ -160,11 +203,21 @@ Największym problemem algorytmu $k$-średnich jest dobór początkowego podzia�
 \todo{wybrać algorytmy grupowania i wskazać miary \textbf{niepodobieństwa} przykładów}
 
 \todo{wskazać parametry wymagające strojenia}
+
 \todo{plan badań}
 
-\section{Miary jakości}
-\label{sec:miary-jakosci}
+\section{Miary}
+\label{sec:miary}
+
+\subsection{Miary podobieństwa}
+\label{subsec:podobienstwo}
+\todo{opisać miary podobieństwa: suma kwadratow, pierwiastek z sumy kwadratow (euklidesowa), manhattan}
+
+\subsection{Miary jakości grupowania}
+\label{subsec:jakosc}
 \todo{ustalić procedury i kryteria oceny jakości}
+
+
 
 \section{Otwarte kwestie}
 \label{sec:otwarte-kwestie}
