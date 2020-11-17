@@ -114,12 +114,12 @@ W~procesie przygotowania danych, należy zastanowić się które atrybuty nale�
 
 Do zbioru danych dodane zostaną dodatkowe atrybuty wygenerowane na podstawie już istniejących oraz wiedzy eksperckiej. Takimi atrybutami mogą być wygenerowane cechy fizyczne przykładowo stosunek wagi do wzrostu lub stosunek przyspieszenia do prędkości maksymalnej.
 
-Ze zbioru definitywnie należy usunąć atrybuty opisowe określające nieinteresujące nas cechy takie jak narodowość, aktualna drużyna, reputacja czy nazwisko. Dodatkowo, ze zbioru danych usunięte zostaną atrybuty opisujące umiejętność gry danego zawodnika na danej pozycji, ponieważ taka informacja znacząco upraszcza zadanie i~mija się z~celem projektu. W~przypadku pozostałych atrybutów należy przeprowadzić analizę korelacyjną, tak aby moć stwierdzić które atrybuty nie wnoszą dodatkowej informacji. Ostatecznie, aby móc grupować zawodników grających na podobnych pozycjach lecz o~różnych poziomiach umiejętności, wartości atrybutów zostaną przeskalowane względem ich średniej wartości.  
+Ze zbioru definitywnie należy usunąć atrybuty opisowe określające nieinteresujące nas cechy takie jak narodowość, aktualna drużyna, reputacja czy nazwisko. Dodatkowo, ze zbioru danych usunięte zostaną atrybuty opisujące umiejętność gry danego zawodnika na danej pozycji, ponieważ taka informacja znacząco upraszcza zadanie i~mija się z~celem projektu. W~przypadku pozostałych atrybutów należy przeprowadzić analizę korelacyjną, tak aby moć przeprowadzić preselekcję, tj. stwierdzić które atrybuty nie wnoszą dodatkowej informacji. Ostatecznie, aby móc grupować zawodników grających na podobnych pozycjach lecz o~różnych poziomiach umiejętności, wartości atrybutów zostaną przeskalowane względem ich średniej wartości.
 
 Jako atrybut ukryty, potraktowana zostania optymalna pozycja na boisku. W~celu przeprowadzenia analizy poprawności badanego algorytmu grupowania, zakładamy że pozycja na boisku zapisana w~zbiorze danych jest jego rzeczywistą optymalną pozycją. Atrybut ten jest niezwykle ciekawy do analizy, ponieważ można go analizować na dwóch poziomach:
 
 \begin{itemize}
-    \item na poziomie ogólnym 
+    \item na poziomie ogólnym:
         \begin{itemize}
             \item bramkarz,
             \item obrońca,
@@ -148,7 +148,7 @@ Oprócz tego, w~zależności od wyników grupowania, można spróbować zdefinio
 
 \subsection{Algorytm k-średnich}
 \label{subsec:kmeans}
-Celem algorytmu $k$-średnich jest pogrupowanie danych na $k$ grup w~taki sposób, aby zminimalizować sumę kwadratów odległości punktów od wyznaczonych centroidów (środków) grup. W~języku R, algorytm ten można wywołać za pomocą polecenia \texttt{kmeans}. 
+Celem algorytmu $k$-średnich jest pogrupowanie danych na $k$ grup w~taki sposób, aby zminimalizować sumę kwadratów odległości punktów od wyznaczonych centroidów (środków) grup. W~języku R, algorytm ten można wywołać za pomocą polecenia \texttt{kmeans}~\cite{kmeans}. 
 
 W~pierwszym kroku algorytmu należy dobrać liczbę poszukiwanych grup oraz przyporządkować w~sposób losowy wszystkie obserwacje do grup. Następnie, w~$i$-tym kroku należy obliczyć położenie centroidu dla każdej grupy i~dla każdego punktu zaktualizować przynależności do grupy. Algorytm kończy się gdy w~danym kroku nie została zmieniona żadna przynależność lub przekroczono maksymalną liczbę kroków.
 
@@ -159,10 +159,32 @@ Głównym parametrem algorytmu $k$-średnich jest liczba szukanych grup $k$. Lic
 Największym problemem algorytmu $k$-średnich jest dobór początkowego podziału na grupy. Możliwymi sposobami są losowy wybór $k$ 
 przykładów ze zbioru danych lub ręczne podanie zbioru centroidów początkowych.
 
-\subsection{Aglomeracyjny algorytm grupowania hierarchicznego}
+\subsection{Algorytmy grupowania hierarchicznego}
 \label{subsec:hierarchical}
-\jsc{tutaj Robercik opisz co masz}
 
+Grupowanie hierarchiczne w eksploracji danych i statystyce jest metodą analizy, która ma na celu zbudowanie hierarchii klastrów. W przeciwieństwie do wielu algorytmów dzielących zbiory danych na klastry w tym wypadku nie jest konieczne wstępne określenie liczby tworzonych klastrów. Alogorytmy grupowania  hierarchicznego dzielimy na dwa typy: aglomeracyjne (łączące) i deglomeracyjne (dzielące) \cite{maimonrokach}. Wynikiem użycia metod hierarchicznego grupowania jest zestaw zagnieżdżonych klastrów, które są zwykle prezentowane w dendrogramie. Dendrogram jest to wielopoziomowa hierarchia, w której klastry z jednego poziomu są połączone i tworzą większe klastry na kolejnych poziomach.
+
+Przy grupowaniu hierarchicznym wykorzystywane są różne sposoby na określanie połączenia między dwoma klastrami. Są to miary odległości pomiędzy dwoma klastrami. Do najbardziej popularnych, możliwych do wyboru w algorytmach wbudowanych w język R należą\cite{rodriguez2015}:
+
+\begin{itemize}
+    \item \textbf{pojedyncze połączenie} - minimalna odległość między obserwacją w jednym klastrze a obserwacją w innym klastrze,
+    \item \textbf{kompletne połączenie} - maksymalna odległość między obserwacją w jednym klastrze a obserwacją w innym klastrze,
+    \item \textbf{średnie połączenie} - średnia odległość między obserwacją w jednym klastrze a obserwacją w innym klastrze,
+    \item \textbf{połączenie centroidalne} - odległość pomiędzy centroidami klastrów,
+    \item \textbf{połączenie medianowe} - mediana odległości między obserwacją w jednym klastrze a obserwacją w innym klastrze
+    \item \textbf{połączenie Ward’a} - suma kwadratów odchyleń od punktów do centroidów
+    \item \textbf{połączenie McQuitty’ego} - gdy dwa klastry A i B zostaną połączone, odległość do nowego klastra C jest średnią odległości A i B do C
+\end{itemize}
+
+
+Należy pamiętać o tym, że w zależności od zbioru danych, niektóre metody mogą działać lepiej od innych.
+
+\subsubsection{Algorytmy aglomeracyjne}
+
+Metody aglomeracyjne są najbardziej popularną metodą grupowania hierarchicznego. Zaraz po rozpoczęciu algorytmu każdy obiekt ze zbioru danych jest traktowany jako pojedynczy klaster. Kolejno klastry są  łączone, do momentu gdy wszystkie klastry zostaną scalone w jeden duży klaster zawierający wszystkie obiekty zbioru danych. W języku R dokonujemy grupowania algorytmem aglomeracyjnym przy użyciu polecenia \texttt{hclust}.
+
+\subsubsection{Algorytmy deglomeracyjne}
+Metody deglomeracyjne są przeciwieństwem metod aglomeracyjnych. Na początku działania algorytmu wszystkie obserwacje znajdują się w jednym klastrze. W kolejnych iteracjach klastry są dzielone na mniejsze. Proces dzielenia klastrów powtarzany jest do momentu, gdy każda obserwacja znajduje się we właściwym klastrze tj. do momentu gdy liczba klastrów będzie równa liczbie obserwacji. W języku R dokonujemy grupowania deglomeracyjnego przy użyciu polecenia \texttt{diana}.
 
 \subsection{Algorytmy grupowania rozmytego}
 \label{subsec:fuzzy}
@@ -180,11 +202,11 @@ Podejście rozmyte może potencjalnie dać więcej korzyści, biorąc pod uwagę
 
 W~projekcie porównamy działanie dwóch algorytmów rozmytego grupowania: fuzzy C-means oraz FANNY.
 
-Podstawowym algorytmem grupowania rozmytego jest rozszerzenie algorytmu $k$-średnich na zbiory rozmyte, znany w~literaturze jako rozmyte $k$-średnich lub fuzzy C-means.
+Podstawowym algorytmem grupowania rozmytego jest rozszerzenie algorytmu $k$-średnich na zbiory rozmyte, znany w~literaturze jako rozmyte $k$-średnich lub fuzzy C-means~\cite{cmeans}.
 
 Algorytm ten nie różni się wiele od wersji oryginalnej. Jedyną różnicą jest zmiana sposobu określania przynależności do grupy, zamiast szukania najbliższej grupy, obliczamy przynależność do wszystkich grup równocześnie. W~pierwszym kroku algorytmu należy dobrać liczbę poszukiwanych grup oraz przyporządkować w~sposób losowy początkowe wartości funkcji przynależności do wszystkich grup. Następnie, w~$i$-tym kroku należy obliczyć położenie centroidu dla każdej grupy, a~dalej dla każdego punktu zaktualizować funkcje przynależności do wszytkich grup. Algorytm kończy działanie w~momencie gdy wartości funkcji przynależności zmieniły się o~wartość mniejszą niż $\epsilon$ lub osiągnięta została maksymalna liczba kroków.
 
-Algorytm rozmytych $k$-średnich został zaimplementowany w~pakiecie \texttt{e1017} jako funkcja \texttt{cmeans}. Parametrami wymagającymi strojenia jest liczba grup, funkcja odległości, maksymalna liczba iteracji oraz stopień rozmycia.
+Algorytm rozmytych $k$-średnich został zaimplementowany w~pakiecie \texttt{e1017} jako funkcja \texttt{cmeans}. Parametrami wymagającymi strojenia jest liczba grup, funkcja odległości, maksymalna liczba iteracji oraz stopień rozmycia~\cite{fanny}.
 
 Drugim badanym przez nas algorytmem będzie algorymt FANNY opracowany przez Kaufmana i~Rousseeuwa~\cite{kaufman2009finding} a~rozszerzony przez Maechlera. Algorytm ten minimalizuje następującą funkcję celu:
 
@@ -197,31 +219,56 @@ gdzie~$n$ oznacza liczbę obserwacji w~zbiorze danych, $k$~jest liczbą grup, $r
 
 Algorytm ten został zaimplementowany w~pakiecie \texttt{cluster} jako funkcja \texttt{fanny}. Parametrami tej funkcji są: liczba grup, wykładnik przynależności, funkcja odległości oraz maksymalna liczba iteracji.
 
-
-\todo{ustalić kryteria lub algorytmy selekcji atrybutów obserwowalnych}
-
-\todo{wybrać algorytmy grupowania i wskazać miary \textbf{niepodobieństwa} przykładów}
-
-\todo{wskazać parametry wymagające strojenia}
-
-\todo{plan badań}
-
 \section{Miary}
 \label{sec:miary}
 
-\subsection{Miary podobieństwa}
+\subsection{Miary niepodobieństwa}
 \label{subsec:podobienstwo}
-\todo{opisać miary podobieństwa: suma kwadratow, pierwiastek z sumy kwadratow (euklidesowa), manhattan}
+Wszystkie opisane wcześniej algorytmy automatycznego grupowania bazują na pewnej funkcji $d(x_{i}, x_{j})$ zwanej miarą niepodobieństwa lub odległości. Opisuje ona jak \emph{różne} są do siebie dwa przykłady. Przykładowymi miarami niepodobieństwa/odległości są: odległość euklidesowa, odległość Minkowskiego oraz odległosć Manhattan.
+
+Najbardziej podstawową miarą niepodobieństwa jest odległość euklidesowa czyli nic innego jak pierwiastek z~sumy kwadratów różnic pomiędzy poszczególnymi atrybutami. Odległość ta dana jest wzorem:
+
+\begin{equation}
+    d_{e}(x, y) = \sqrt{\sum_{k=1}^{n} (x_k - y_k)^{2}}
+\end{equation}
+
+Bardziej ogólną wersją odleglości euklidesowej jest odległość Minkowskiego~\cite{irani2016clustering}. Jest ona dana wzorem:
+
+\begin{equation}
+    d_{mink}(x, y) = \sqrt[p]{\sum_{k=1}^{n} (x_k - y_k)^{p}}
+\end{equation}
+
+Dla $p=2$ otrzymujemy odległość euklidesową, natomiast dla $p \xrightarrow{} \infty$ otrzymujemy odległość Czebyszewa, która jest zdefiniowana jako największa różnicą pomiędzy parą atrybutów:
+
+\begin{equation}
+    d_{cheb}(x, y) = \max_{k} |x_k - y_k|
+\end{equation}
+
+Ostatnią rozważaną miarą podobieństwa jest odległość Manhattan. Bierze ona swoją nazwę od regularnej siatki ulic w~dzielnicy Manhattan w~Nowym Yorku. Odległość dwóch punktów w tej metryce to suma wartości bezwzględnych różnic ich współrzędnych.
+
+\begin{equation}
+\label{eqn:manhattan}
+d_{manh}(x, y) = \sum_{k=1}^{n}|x_k - y_k|
+\end{equation}
 
 \subsection{Miary jakości grupowania}
 \label{subsec:jakosc}
-\todo{ustalić procedury i kryteria oceny jakości}
 
+\subsubsection{Podejście nadzorowane}
+Automatyczne grupowanie jest dziedziną uczenia nienadzorowanego, co sprawia że określenie jakości działania algorytmu jest bardziej złożone niż w~przypadku uczenia nadzorowanego. Częśc miar wykorzystuje informację o~atrybucie ukrytym, jednak nie w~takim stopniu jak typowe miary klasyfikacji jak na przykład macierz pomyłek (i~wszystkie powiązanie z~nią wskaźniki). Wskaźniki te to skorygowany index Rand, wskaźnik skorygowanej informacji wzajemnej, wskaźnik jednorodności, wskaźnik kompletności, wskaźnik Fowlkesa-Mallowesa oraz V-wskaźnik~\cite{scikit}. 
 
+Wskaźniki te mogą dać informację jak poprawne jest nasze grupowanie, jednak do ich obliczenia potrzebna będzie informacja o~wartości atrybutu ukrytego. Z~racji mnogości omawianych pozycji oraz ich względnej nieseparowalności, tego typu rozważania należy prowadzić na poziomie ogólnym, opisanym w~sekcji~\ref{subsec:atrybuty}.
+
+\subsubsection{Podejście nienadzorowane}
+Drugim, znacznie ciekawszym, podejściem do problemu jest pominięcie wartości atrybutu ukrytego i~skupienie się na jakości wewnętrznej samego grupowania. Wartość danej miary jakości jest określana na podstawie samego podziału, bez dodatkowej informacji o~wartości atrybutu ukrytego. Miary tego typu skupiają się na głównie na separowalności samych grup oraz na tym jak są dobrze wewnętrznie spójne i~określone. Metryki tego typu to wariancja wewnątrzgrupowa, wskaźnik sylwetki, wskaźnik Calinskiego-Harabasza oraz indeks Daviesa-Bouldina.
+
+Na podstawie miar tego typu można spróbować dobrać najlepszą ilość grup na jaką można podzielić zbiór danych. Im mniej grup tym więcej informacji tracimy, natomiast za duża liczba grup spowoduje nadmierne dopasowanie. Wykorzystując przykładowo wariancję wewnątrzgrupową można spróbować dobrać parametr $k$ w~algorytmie $k$-średnich, stosując regułę \emph{łokcia}. Na wykresie rysuje się zależność sumy wariancji wewnątrzgrupowej od liczby grup. Punkt przełamania wykresu (nazywane łokciem) wskaże najlepszą liczbę grup, która obejmuje dobrze generalizuje oraz unika nadmiernego dopasowania.
 
 \section{Otwarte kwestie}
 \label{sec:otwarte-kwestie}
-\todo{do zostawienia sposób opisu grup i charakteryzowania ich specyfiki na podstawie rozkładu wartości atrybutów}
+Pierwszym spostrzeżeniem po przyjrzeniu się danym było zauważenie że klasyczne algorytmy grupowania mogą mieć problem z~połączeniem ze sobą dwóch zawodników, którzy w~rzeczywistości grają na tej samej pozycji lecz na zupełnie innym poziomie. Przykładowo, Manuel Neuer oraz Pavels Steinbors obaj grają na pozycji bramkarza lecz jeden z~nich gra w~drużynie mistrza Niemiec a drugi w~pierwszoligowej Arce Gdynia -- bezwzględne wartości ich statystyk będą odmiennie różne. Początkowo zaproponowaliśmy zamianę pierwotnych wartości atrybutów na ich róznicę od średniej, jednak rozwiązanie to wydaje się niepewne. W~przypadku niezadowalających wyników trzeba będzie zastosować inną metodę normalizacji danych. Ciekawym podejściem do tego problemu będzie wykorzystanie korelacyjnych miar odległości pomiędzy dwoma przykładami lub wykorzystujące odległośc kosinusową. Metody obliczające niepodobieństwo w~ten sposób zostały zaimplementowane w~pakiecie \texttt{proxy} języka~R~\cite{proxy}.
+
+Dodatkową sprawą wymagającą działania jest sama liczba atrybutów. W~opisywanym zbiorze danych liczba atrybutów sięga prawie stu, co przy braku przeprowadzenia selekcji, może znacząco osłabić działanie algorytmów grupowania. W~sekcji~\ref{subsec:atrybuty}~opisane zostały metody usuwania atrybutów ze zbioru takie jak proste usuwanie niepotrzebnych kolumn lub analiza korelacyjna. W~przypadku gdy niezadowalających wyników, ręczną analizę korelacyjną można zastąpić automatyczną analizą głównych składowych (\emph{ang. Principal Component Analysis}, która pozwala na zmniejszenie wymiarowości problemu, kosztem części informacji zawartej w~zbiorze. 
 
 \bibliographystyle{abbrv}
 \bibliography{bibliography}
