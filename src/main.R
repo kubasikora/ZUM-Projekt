@@ -2,6 +2,7 @@ library(data.table)
 library(measurements)
 library(mltools)
 
+
 # load original data from file
 playersFull <- read.csv("../data/data.csv")
 summary(playersFull)
@@ -57,7 +58,6 @@ playersEncoded$Height <- 0.3048 * z$X1 + 0.0254 * z$X2
 playersEncoded$Weight <- 0.45359237 * as.numeric(strsplit(as.character(playersEncoded$Weight), "lbs"))
 
 
-
 #### prepare 
 playersPositions <- subset(playersEncoded, select=c("Position"))
 playersData <- subset(playersEncoded, select=-c(Position))
@@ -65,10 +65,24 @@ playersData <- subset(playersEncoded, select=-c(Position))
 #### scale attributes
 playersData <- scale(playersData)
 
-km.result <- kmeans(playersData, 4, iter.max=100, nstart=25)
 
-#If you want to add the point classifications to the original data, use this: 
-dd <- cbind(playersPositions, cluster=km.result$cluster)
-View(dd)
+#### run basic kmeans in loop
+minK = 2
+maxK = 50
+
+km.vars <- NA
+km.results <- list()
+
+for(i in minK:maxK){ 
+    result <- kmeans(playersData, i, iter.max=1000, nstart=25)
+    km.results[[i-minK+1]] <- result
+    km.vars[i] <- result$tot.withinss
+    print(i)
+}
+
+plot(km.vars)
+
+warresultComparision <- cbind(playersPositions, cluster=km.result$cluster)
+View(resultComparision)
 
 
