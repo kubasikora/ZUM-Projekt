@@ -45,7 +45,8 @@ playersEncoded$Body.Type[playersEncoded$Body.Type == "Courtois"] <- "Lean"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "PLAYER_BODY_TYPE_25"] <- "Normal"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Shaqiri"] <- "Stocky"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Akinfenwa"] <- "Stocky"
-playersEncoded$Body.Type <- one_hot(as.data.table(factor(as.numeric(playersEncoded$Body.Type), labels=c("Lean", "Normal", "Stocky"))))
+playersEncoded[c("Body.Type.Lean", "Body.Type.Normal", "Body.Type.Stocky")] <- one_hot(as.data.table(factor(as.numeric(playersEncoded$Body.Type), labels=c("Lean", "Normal", "Stocky"))))
+playersEncoded <- subset(playersEncoded, select=-c(Body.Type))
 
 # convert height in ft to cm
 z <- data.frame(do.call("rbind", strsplit(as.character(playersEncoded$Height), "'", fixed=TRUE)))
@@ -55,9 +56,19 @@ playersEncoded$Height <- 0.3048 * z$X1 + 0.0254 * z$X2
 # convert weight in lbs to kg
 playersEncoded$Weight <- 0.45359237 * as.numeric(strsplit(as.character(playersEncoded$Weight), "lbs"))
 
-####### to do
-### jak potraktować atrybut ukryty - wg mnie moze zostac
-### skalowanie atrybutów
 
-View(playersEncoded)
+
+#### prepare 
+playersPositions <- subset(playersEncoded, select=c("Position"))
+playersData <- subset(playersEncoded, select=-c(Position))
+
+#### scale attributes
+playersData <- scale(playersData)
+
+km.result <- kmeans(playersData, 4, iter.max=100, nstart=25)
+
+#If you want to add the point classifications to the original data, use this: 
+dd <- cbind(playersPositions, cluster=km.result$cluster)
+View(dd)
+
 
