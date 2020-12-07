@@ -1,7 +1,7 @@
 library(data.table)
 library(measurements)
 library(mltools)
-
+library(cluster)
 
 # load original data from file
 playersFull <- read.csv("../data/data.csv")
@@ -46,8 +46,7 @@ playersEncoded$Body.Type[playersEncoded$Body.Type == "Courtois"] <- "Lean"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "PLAYER_BODY_TYPE_25"] <- "Normal"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Shaqiri"] <- "Stocky"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Akinfenwa"] <- "Stocky"
-playersEncoded[c("Body.Type.Lean", "Body.Type.Normal", "Body.Type.Stocky")] <- one_hot(as.data.table(factor(as.numeric(playersEncoded$Body.Type), labels=c("Lean", "Normal", "Stocky"))))
-playersEncoded <- subset(playersEncoded, select=-c(Body.Type))
+playersEncoded$Body.Type <- as.numeric(factor(playersEncoded$Body.Type, levels=c("Lean", "Normal", "Stocky")))
 
 # convert height in ft to cm
 z <- data.frame(do.call("rbind", strsplit(as.character(playersEncoded$Height), "'", fixed=TRUE)))
@@ -57,32 +56,79 @@ playersEncoded$Height <- 0.3048 * z$X1 + 0.0254 * z$X2
 # convert weight in lbs to kg
 playersEncoded$Weight <- 0.45359237 * as.numeric(strsplit(as.character(playersEncoded$Weight), "lbs"))
 
+# add BMI column
+playersEncoded$BMI <- playersEncoded$Weight / (playersEncoded$Height * playersEncoded$Height)
 
-#### prepare 
+#### prepare and scale attributes
+playersNumeric <- playersEncoded
+playersNumeric$Position <- as.numeric(factor(playersNumeric$Position))
 playersPositions <- subset(playersEncoded, select=c("Position"))
 playersData <- subset(playersEncoded, select=-c(Position))
-
-#### scale attributes
 playersData <- scale(playersData)
 
 
-#### run basic kmeans in loop
+#### select final set of attributes
+playersAttributesFinal <-subset(playersData, select=c("Age", "Preferred.Foot", "Weak.Foot", 
+                                                      "Crossing", "LongPassing", "Reactions", 
+                                                      "Balance", "Penalties", "Work.Rate.Offensive", 
+                                                      "Work.Rate.Defensive", "BMI", "Body.Type"))
+
+GK.Skills <- c(apply(X=subset(playersData, select=c("GKDiving", "GKHandling", "GKKicking", "GKPositioning", "GKReflexes")), 
+                                                     MARGIN=1, 
+                                                     FUN=mean))
+
+Tackling <- c(apply(X=subset(playersData, select=c("Interceptions", "StandingTackle", "SlidingTackle", "Aggression", "Marking")), 
+                    MARGIN=1, 
+                    FUN=mean))
+
+Swiftness <- c(apply(X=subset(playersData, select=c("SprintSpeed", "Acceleration")), 
+                     MARGIN=1, 
+                     FUN=mean))
+
+Short.Ball.Skills <- c(apply(X=subset(playersData, select=c("BallControl", "ShortPassing", "Dribbling", "Skill.Moves")), 
+                             MARGIN=1, 
+                             FUN=mean))
+
+Intelligence <- c(apply(X=subset(playersData, select=c("Positioning", "Vision", "Composure")), 
+                        MARGIN=1, 
+                        FUN=mean))
+
+Shooting <- c(apply(X=subset(playersData, select=c("Finishing", "Volleys", "LongShots")), 
+                    MARGIN=1, 
+                    FUN=mean))
+
+Headers <- c(apply(X=subset(playersData, select=c("HeadingAccuracy", "Jumping")), 
+                   MARGIN=1, 
+                   FUN=mean))
+
+Free.Kicks <- c(apply(X=subset(playersData, select=c("FKAccuracy", "Curve")), 
+                      MARGIN=1, 
+                      FUN=mean))
+
+playersAttributesFinal <- cbind(playersAttributesFinal, 
+                                GK.Skills, 
+                                Tackling, 
+                                Swiftness, 
+                                Short.Ball.Skills, 
+                                Intelligence,
+                                Shooting, 
+                                Headers, 
+                                Free.Kicks)
+
+### pam version -> k-medioids
 minK = 2
-maxK = 50
+maxK = 30
 
-km.vars <- NA
-km.results <- list()
+euclideanDistanceMatrix <- dist(playersAttributesFinal, method="euclidean")
+pam.results <- list()
 
-for(i in minK:maxK){ 
-    result <- kmeans(playersData, i, iter.max=1000, nstart=25)
-    km.results[[i-minK+1]] <- result
-    km.vars[i] <- result$tot.withinss
+for(i in minK:maxK){
+    result <- pam(euclideanDistanceMatrix, i, diss=TRUE, pamonce=5)
+    pam.results[[i-minK+1]] <- result
     print(i)
 }
 
-plot(km.vars)
 
-warresultComparision <- cbind(playersPositions, cluster=km.result$cluster)
 View(resultComparision)
 
 
