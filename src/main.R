@@ -3,6 +3,7 @@ library(measurements)
 library(mltools)
 library(cluster)
 library(dplyr)
+library(proxy)
 
 # load original data from file
 playersFull <- read.csv("../data/data.csv")
@@ -121,16 +122,25 @@ SAMPLE_RATIO <- 0.1
 clusteringInput <- slice_sample(playersAttributesFinal, prop=SAMPLE_RATIO)
 summary(clusteringInput)
 
+
 ### pam version -> k-medioids
 minK = 2
 maxK = 30
 
-euclideanDistanceMatrix <- dist(clusteringInput, method="euclidean")
-pam.results <- list()
+euclideanDistanceMatrix <- dist(clusteringInput, method="Euclidean")
+clustering.result <- list()
+centroids.result < list()
 
 for(i in minK:maxK){
-    result <- pam(euclideanDistanceMatrix, i, diss=TRUE, pamonce=5)
-    pam.results[[i-minK+1]] <- result
+    # find initial clusters for sampled data.frame
+    result <- pam(euclideanDistanceMatrix, i, diss=TRUE, pamonce=5, keep.diss=TRUE)
+    centroids.result <- result$medoids
+    
+    # find clusters for all examples
+    medoids <- playersAttributesFinal[result$medoids,]
+    distances <- dist(playersAttributesFinal, medoids, method="Euclidean")
+    clustering.result[[i-minK+1]] <- apply(distances, 1, which.min)
+    
     print(i)
 }
 
