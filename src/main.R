@@ -2,6 +2,7 @@ library(data.table)
 library(measurements)
 library(mltools)
 library(cluster)
+library(dplyr)
 
 # load original data from file
 playersFull <- read.csv("../data/data.csv")
@@ -68,10 +69,10 @@ playersData <- scale(playersData)
 
 
 #### select final set of attributes
-playersAttributesFinal <-subset(playersData, select=c("Age", "Preferred.Foot", "Weak.Foot", 
+playersAttributesFinal <-as.data.frame(subset(playersData, select=c("Age", "Preferred.Foot", "Weak.Foot", 
                                                       "Crossing", "LongPassing", "Reactions", 
                                                       "Balance", "Penalties", "Work.Rate.Offensive", 
-                                                      "Work.Rate.Defensive", "BMI", "Body.Type"))
+                                                      "Work.Rate.Defensive", "BMI", "Body.Type")))
 
 GK.Skills <- c(apply(X=subset(playersData, select=c("GKDiving", "GKHandling", "GKKicking", "GKPositioning", "GKReflexes")), 
                                                      MARGIN=1, 
@@ -115,11 +116,16 @@ playersAttributesFinal <- cbind(playersAttributesFinal,
                                 Headers, 
                                 Free.Kicks)
 
+### select random sample from the data
+SAMPLE_RATIO <- 0.1
+clusteringInput <- slice_sample(playersAttributesFinal, prop=SAMPLE_RATIO)
+summary(clusteringInput)
+
 ### pam version -> k-medioids
 minK = 2
 maxK = 30
 
-euclideanDistanceMatrix <- dist(playersAttributesFinal, method="euclidean")
+euclideanDistanceMatrix <- dist(clusteringInput, method="euclidean")
 pam.results <- list()
 
 for(i in minK:maxK){
@@ -128,7 +134,4 @@ for(i in minK:maxK){
     print(i)
 }
 
-
-View(resultComparision)
-
-
+View(pam.results)
