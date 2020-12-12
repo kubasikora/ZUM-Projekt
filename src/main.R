@@ -7,7 +7,7 @@ library(clusterCrit)
 library(fpc)
 
 # load original data from file
-playersFull <- read.csv("./ZUM/data.csv")
+playersFull <- read.csv("./data/data.csv")
 summary(playersFull)
 
 #### clear the data from unnecessary columns and rows
@@ -125,30 +125,120 @@ summary(clusteringInput)
 
 ### pam version -> k-medioids with euclidean distance
 minK = 2
-maxK = 10
+maxK = 30
 
+print("Euclidean")
 euclideanDistanceMatrix <- dist(clusteringInput, method="Euclidean")
 euclideanDistanceMatrixFull <- dist(playersAttributesFinal, method="Euclidean")
-result.pams <- list()
-result.centroids <- list()
-result.clustering <- list()
-result.metrics <- list()
+result.euclidean.pams <- list()
+result.euclidean.centroids <- list()
+result.euclidean.clustering <- list()
+result.euclidean.metrics <- list()
 
 for(i in minK:maxK){
     # find initial clusters for sampled data.frame
     result <- pam(euclideanDistanceMatrix, i, diss=TRUE, pamonce=5, keep.diss=TRUE)
+    print(paste("Found ", i, "clusters"))
     
-    result.pams[[i-minK+1]] <- result
-    
-    result.centroids[[i-minK+1]] <- result$medoids
+    result.euclidean.pams[[i-minK+1]] <- result
+    result.euclidean.centroids[[i-minK+1]] <- result$medoids
     
     # find clusters for all examples
     medoids <- playersAttributesFinal[result$medoids,]
     distances <- dist(playersAttributesFinal, medoids, method="Euclidean")
-    result.clustering[[i-minK+1]] <- apply(distances, 1, which.min)
-   
-    # find metric values 
-    result.metrics[[i-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.clustering[[i-minK+1]])
+    result.euclidean.clustering[[i-minK+1]] <- apply(distances, 1, which.min)
+    print(paste("Found clusters for all examples"))
     
-    print(i)
+    # find metric values 
+    result.euclidean.metrics[[i-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering[[i-minK+1]])
+    print(paste("Evaluated metrics for", i, "clusters"))
 }
+
+### pam version -> k-medioids with minkowski distance with p = 3
+
+print("Minkowski")
+minkowskiDistanceMatrix <- dist(clusteringInput, method="Minkowski", p=3)
+minkowskiDistanceMatrixFull <- dist(playersAttributesFinal, method="Minkowski", p=3)
+result.minkowski.pams <- list()
+result.minkowski.centroids <- list()
+result.minkowski.clustering <- list()
+result.minkowski.metrics <- list()
+
+for(i in minK:maxK){
+    # find initial clusters for sampled data.frame
+    result <- pam(minkowskiDistanceMatrix, i, diss=TRUE, pamonce=5, keep.diss=TRUE)
+    print(paste("Found ", i, "clusters"))
+    
+    result.minkowski.pams[[i-minK+1]] <- result
+    result.minkowski.centroids[[i-minK+1]] <- result$medoids
+    
+    # find clusters for all examples
+    medoids <- playersAttributesFinal[result$medoids,]
+    distances <- dist(playersAttributesFinal, medoids, method="Minkowski", p=3)
+    result.minkowski.clustering[[i-minK+1]] <- apply(distances, 1, which.min)
+    print(paste("Found clusters for all examples"))
+    
+    # find metric values 
+    result.minkowski.metrics[[i-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering[[i-minK+1]])
+    print(paste("Evaluated metrics for", i, "clusters"))
+}
+
+### 
+
+print("Manhattan")
+manhattanDistanceMatrix <- dist(clusteringInput, method="Manhattan")
+manhattanDistanceMatrixFull <- dist(playersAttributesFinal, method="Manhattan")
+result.manhattan.pams <- list()
+result.manhattan.centroids <- list()
+result.manhattan.clustering <- list()
+result.manhattan.metrics <- list()
+
+for(i in minK:maxK){
+    # find initial clusters for sampled data.frame
+    result <- pam(manhattanDistanceMatrix, i, diss=TRUE, pamonce=5, keep.diss=TRUE)
+    print(paste("Found ", i, "clusters"))
+    
+    result.manhattan.pams[[i-minK+1]] <- result
+    result.manhattan.centroids[[i-minK+1]] <- result$medoids
+    
+    # find clusters for all examples
+    medoids <- playersAttributesFinal[result$medoids,]
+    distances <- dist(playersAttributesFinal, medoids, method="Manhattan")
+    result.manhattan.clustering[[i-minK+1]] <- apply(distances, 1, which.min)
+    print(paste("Found clusters for all examples"))
+    
+    # find metric values 
+    result.manhattan.metrics[[i-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering[[i-minK+1]])
+    print(paste("Evaluated metrics for", i, "clusters"))
+}
+
+####
+
+print("Correlation")
+correlationDistanceMatrix <- dist(clusteringInput, method="correlation")
+correlationDistanceMatrixFull <- dist(playersAttributesFinal, method="correlation")
+result.correlation.pams <- list()
+result.correlation.centroids <- list()
+result.correlation.clustering <- list()
+result.correlation.metrics <- list()
+
+for(i in minK:maxK){
+    # find initial clusters for sampled data.frame
+    result <- pam(euclideanDistanceMatrix, i, diss=TRUE, pamonce=5, keep.diss=TRUE)
+    print(paste("Found ", i, "clusters"))
+    
+    result.correlation.pams[[i-minK+1]] <- result
+    result.correlation.centroids[[i-minK+1]] <- result$medoids
+    
+    # find clusters for all examples
+    medoids <- playersAttributesFinal[result$medoids,]
+    distances <- dist(playersAttributesFinal, medoids, method="Euclidean")
+    result.correlation.clustering[[i-minK+1]] <- apply(distances, 1, which.min)
+    print(paste("Found clusters for all examples"))
+    
+    # find metric values 
+    result.correlation.metrics[[i-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.correlation.clustering[[i-minK+1]])
+    print(paste("Evaluated metrics for", i, "clusters"))
+}
+
+## print(result.euclidean.metrics[[1]]$dunn)
