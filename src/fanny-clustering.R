@@ -192,7 +192,7 @@ for(i in minK:maxK){
   result.correlation.metrics[[i-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering[[i-minK+1]])
   result.correlation.compare.outfield[[i-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering[[i-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
   result.correlation.compare.general[[i-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering[[i-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
-  result.correlation.compare.specific[[i-minK+1]] <- cluster.stats(correlationnDistanceMatrixFull, result.correlation.clustering[[i-minK+1]], alt.clustering=specificTrueClustering, compareonly=TRUE)
+  result.correlation.compare.specific[[i-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering[[i-minK+1]], alt.clustering=specificTrueClustering, compareonly=TRUE)
   print(paste("Evaluated metrics for", i, "clusters"))
 }
 rm(correlationDistanceMatrix)
@@ -233,5 +233,5 @@ save(result.correlation.fannys,
      result.euclidean.compare.specific,
      
      clusteringInput, 
-     file="./results/fanny-results-full.RData"
+     file="./results/fanny-results-full.RData", version=2
 )
