@@ -30,15 +30,15 @@ result.euclidean.metrics <- list()
 
 for(i in minK:maxK){
   # find initial clusters for sampled data.frame
-  result <- fcm(playersAttributesFinal, i, dmetric="euclidean")
+  result <- fcm(playersAttributesFinal, i, dmetric="euclidean", m=1.2)
   result.euclidean.ppclusts[[i-minK+1]] <- result
-  result.euclidean.memberships <- result$u
-  result.euclidean.centroids <- result$v
+  result.euclidean.memberships[[i-minK+1]] <- result$u
+  result.euclidean.centroids[[i-minK+1]] <- result$v
   
   print(paste("Found ", i, "clusters"))
 
   # find metric values 
-  result.euclidean.metrics[i-minK+1] <- SIL.F(euclideanDistanceMatrixFull, result.euclidean.memberships[[i-minK+1]], alpha=1, distance=TRUE)
+  result.euclidean.metrics[[i-minK+1]] <- SIL.F(euclideanDistanceMatrixFull, result.euclidean.memberships[[i-minK+1]], alpha=1, distance=TRUE)
   print(paste("Evaluated metrics for", i, "clusters"))
 }
 rm(euclideanDistanceMatrixFull)
@@ -56,15 +56,15 @@ result.minkowski.metrics <- list()
 
 for(i in minK:maxK){
   # find initial clusters for sampled data.frame
-  result <- fcm(playersAttributesFinal, i, dmetric="minkowski", pw=3)
+  result <- fcm(playersAttributesFinal, i, dmetric="minkowski", pw=3, m=1.2)
   result.minkowski.ppclusts[[i-minK+1]] <- result
-  result.minkowski.memberships <- result$u
-  result.minkowski.centroids <- result$v
+  result.minkowski.memberships[[i-minK+1]] <- result$u
+  result.minkowski.centroids[[i-minK+1]] <- result$v
   
   print(paste("Found ", i, "clusters"))
   
   # find metric values 
-  result.minkowski.metrics[i-minK+1] <- SIL.F(minkowskiDistanceMatrixFull, result.minkowski.memberships[[i-minK+1]], alpha=1, distance=TRUE)
+  result.minkowski.metrics[[i-minK+1]] <- SIL.F(minkowskiDistanceMatrixFull, result.minkowski.memberships[[i-minK+1]], alpha=1, distance=TRUE)
   print(paste("Evaluated metrics for", i, "clusters"))
 }
 rm(minkowskiDistanceMatrixFull)
@@ -84,13 +84,13 @@ for(i in minK:maxK){
   # find initial clusters for sampled data.frame
   result <- fcm(playersAttributesFinal, i, dmetric="manhattan")
   result.manhattan.ppclusts[[i-minK+1]] <- result
-  result.manhattan.memberships <- result$u
-  result.manhattan.centroids <- result$v
+  result.manhattan.memberships[[i-minK+1]] <- result$u
+  result.manhattan.centroids[[i-minK+1]] <- result$v
   
   print(paste("Found ", i, "clusters"))
   
   # find metric values 
-  result.manhattan.metrics[i-minK+1] <- SIL.F(manhattanDistanceMatrixFull, result.manhattan.memberships[[i-minK+1]], alpha=1, distance=TRUE)
+  result.manhattan.metrics[[i-minK+1]] <- SIL.F(manhattanDistanceMatrixFull, result.manhattan.memberships[[i-minK+1]], alpha=1, distance=TRUE)
   print(paste("Evaluated metrics for", i, "clusters"))
 }
 rm(manhattanDistanceMatrixFull)
@@ -109,15 +109,15 @@ result.correlation.metrics <- list()
 
 for(i in minK:maxK){
   # find initial clusters for sampled data.frame
-  result <- fcm(playersAttributesFinal, i, dmetric="correlation")
+  result <- fcm(playersAttributesFinal, i, dmetric="correlation", m=1.2)
   result.correlation.ppclusts[[i-minK+1]] <- result
-  result.correlation.memberships <- result$u
-  result.correlation.centroids <- result$v
+  result.correlation.memberships[[i-minK+1]] <- result$u
+  result.correlation.centroids[[i-minK+1]] <- result$v
   
   print(paste("Found ", i, "clusters"))
   
   # find metric values 
-  result.correlation.metrics[i-minK+1] <- SIL.F(correlationDistanceMatrixFull, result.correlation.memberships[[i-minK+1]], alpha=1, distance=TRUE)
+  result.correlation.metrics[[i-minK+1]] <- SIL.F(correlationDistanceMatrixFull, result.correlation.memberships[[i-minK+1]], alpha=1, distance=TRUE)
   print(paste("Evaluated metrics for", i, "clusters"))
 }
 rm(correlationDistanceMatrixFull)
@@ -144,5 +144,5 @@ save(result.correlation.ppclusts,
      result.euclidean.centroids, 
      result.euclidean.metrics,
      
-     file="./results/cmeans-results-full.RData", version=2
+     file="../results/cmeans-results-full.RData", version=2
 )

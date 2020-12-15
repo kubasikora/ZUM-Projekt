@@ -3,7 +3,7 @@ library(cluster)
 library(dplyr)
 
 # load original data from file
-playersFull <- read.csv("../data/data.csv")
+playersFull <- read.csv("./data/data.csv")
 summary(playersFull)
 
 #### clear the data from unnecessary columns and rows
