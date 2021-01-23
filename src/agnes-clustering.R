@@ -1,3 +1,8 @@
+# Skrypt realizujący eksperymenty wykorzystujące algorytm hierarchiczny w wersji aglomeracyjnej. Eksperymenty 
+# przeprowadzane za pomocą skryptu pozwalają na uzyskanie danych opisujących wpływ sposobów łączenia próbek danych 
+# w grupy, a także wpływ wykorzystywanych różnych miar niepodobieństwa na jakość grupowania.
+# Wynikiem skryptu jest plik zawierający dane zawierające wartości miar jakości grupowania do dalszej analizy.
+
 library(mltools)
 library(cluster)
 library(dplyr)
@@ -6,27 +11,28 @@ library(clv)
 library(clusterCrit)
 library(fpc)
 
+# wczytanie danych
 source("./dataPreparation.R")
 
-#### select random sample from the data
+# wybór losowych danych o zdefiniowanym rozmiarze
 SAMPLE_RATIO <- 0.1
 clusteringInput <- slice_sample(playersAttributesFinal, prop=SAMPLE_RATIO)
 summary(clusteringInput)
 
-#### range of numbers of clusters to create during tests
+# zakres liczby grup wynikowych podczas testów
 minK = 2
 maxK = 40
 
-#### linkage methods
+# badane sposoby połączeń
 linkageMethods <- c("average", "complete")
 
 ##########################################################################################
 
-#### distance matrices for different methods
+# macierze odległości dla pełnego i losowo dobranego małego zbioru danych
 euclideanDistanceMatrix <- dist(clusteringInput, method="Euclidean")
 euclideanDistanceMatrixFull <- dist(playersAttributesFinal, method="Euclidean")
 
-# results
+# alokacja tablic wynikowych dla połączenia średniego
 result.euclidean.centroids.average <- list()
 result.euclidean.clustering.average <- list()
 result.euclidean.metrics.average <- list()
@@ -34,6 +40,7 @@ result.euclidean.compare.outfield.average <- list()
 result.euclidean.compare.general.average <- list()
 result.euclidean.compare.specific.average <- list()
 
+# alokacja tablic wynikowych dla połączenia kompletnego
 result.euclidean.centroids.complete <- list()
 result.euclidean.clustering.complete <- list()
 result.euclidean.metrics.complete <- list()
@@ -45,16 +52,20 @@ print("=========================================================================
 print("Euclidean")
 print("===========================================================================")
 
+# petle realizujące przejście algorytmów dla różnych metod połączeń i różnych wartości k przy wykorzystaniu
+# ogległości euklidesowej
 for (m in 1:length(linkageMethods)) {
   print(paste("Method: ", linkageMethods[m]))
   print("===========================================================================")
+
+  # przeprowadzenie algorytmu aglomeracyjnego
   result <- agnes(euclideanDistanceMatrix, diss=TRUE, method=linkageMethods[m])
   for (k in minK:maxK) {
-    # find initial clusters for sampled data.frame
+    # znalezienie początkowego grupowania w zależności od k
     clustering <- cutree(result, k=k)
     print(paste("Found ", k, "clusters"))
     
-    # find centroids of the clusters
+    # znalezienie środków wyznaczonych grup
     idx <- (clustering == 1)
     centroids <- colMeans(clusteringInput[idx,])
     for (i in 2:k) {
@@ -68,11 +79,11 @@ for (m in 1:length(linkageMethods)) {
     if (linkageMethods[m] == 'average') {
       result.euclidean.centroids.average[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.euclidean.clustering.average[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.euclidean.metrics.average[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.average[[k-minK+1]])
       result.euclidean.compare.outfield.average[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.average[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.euclidean.compare.general.average[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.average[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -83,11 +94,11 @@ for (m in 1:length(linkageMethods)) {
     } else {
       result.euclidean.centroids.complete[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.euclidean.clustering.complete[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.euclidean.metrics.complete[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.complete[[k-minK+1]])
       result.euclidean.compare.outfield.complete[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.complete[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.euclidean.compare.general.complete[[k-minK+1]] <- cluster.stats(euclideanDistanceMatrixFull, result.euclidean.clustering.complete[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -99,9 +110,11 @@ for (m in 1:length(linkageMethods)) {
   }
 }
 
+# usuwanie zbędnych macierzy
 rm(euclideanDistanceMatrix)
 rm(euclideanDistanceMatrixFull)
 
+# zapis danych wynikowych w pliku .Rdata
 save(
   result.euclidean.centroids.average,
   result.euclidean.clustering.average,
@@ -123,10 +136,11 @@ save(
 
 ##########################################################################################
 
-
+# macierze odległości dla pełnego i losowo dobranego małego zbioru danych
 manhattanDistanceMatrix <- dist(clusteringInput, method="Manhattan")
 manhattanDistanceMatrixFull <- dist(playersAttributesFinal, method="Manhattan")
 
+# alokacja tablic wynikowych dla połączenia średniego
 result.manhattan.centroids.average <- list()
 result.manhattan.clustering.average <- list()
 result.manhattan.metrics.average <- list()
@@ -134,6 +148,7 @@ result.manhattan.compare.outfield.average <- list()
 result.manhattan.compare.general.average <- list()
 result.manhattan.compare.specific.average <- list()
 
+# alokacja tablic wynikowych dla połączenia kompletnego
 result.manhattan.centroids.complete <- list()
 result.manhattan.clustering.complete <- list()
 result.manhattan.metrics.complete <- list()
@@ -145,16 +160,18 @@ print("=========================================================================
 print("Manhattan")
 print("===========================================================================")
 
+# petle realizujące przejście algorytmów dla różnych metod połączeń i różnych wartości k przy wykorzystaniu
+# ogległości Manhattan
 for (m in 1:length(linkageMethods)) {
   print(paste("Method: ", linkageMethods[m]))
   print("===========================================================================")
   result <- agnes(manhattanDistanceMatrix, diss=TRUE, method=linkageMethods[m])
   for (k in minK:maxK) {
-    # find initial clusters for sampled data.frame
+    # znalezienie początkowego grupowania w zależności od k
     clustering <- cutree(result, k=k)
     print(paste("Found ", k, "clusters"))
     
-    # find centroids of the clusters
+    # znalezienie środków wyznaczonych grup
     idx <- (clustering == 1)
     centroids <- colMeans(clusteringInput[idx,])
     for (i in 2:k) {
@@ -168,11 +185,11 @@ for (m in 1:length(linkageMethods)) {
     if (linkageMethods[m] == 'average') {
       result.manhattan.centroids.average[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.manhattan.clustering.average[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.manhattan.metrics.average[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.average[[k-minK+1]])
       result.manhattan.compare.outfield.average[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.average[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.manhattan.compare.general.average[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.average[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -183,11 +200,11 @@ for (m in 1:length(linkageMethods)) {
     } else {
       result.manhattan.centroids.complete[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.manhattan.clustering.complete[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.manhattan.metrics.complete[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.complete[[k-minK+1]])
       result.manhattan.compare.outfield.complete[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.complete[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.manhattan.compare.general.complete[[k-minK+1]] <- cluster.stats(manhattanDistanceMatrixFull, result.manhattan.clustering.complete[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -199,9 +216,11 @@ for (m in 1:length(linkageMethods)) {
   }
 }
 
+# usuwanie zbędnych macierzy
 rm(manhattanDistanceMatrix)
 rm(manhattanDistanceMatrixFull)
 
+# zapis danych wynikowych w pliku .Rdata
 save(
   result.manhattan.centroids.average,
   result.manhattan.clustering.average,
@@ -224,11 +243,11 @@ save(
 
 ##########################################################################################
 
-
+# macierze odległości dla pełnego i losowo dobranego małego zbioru danych
 minkowskiDistanceMatrix <- dist(clusteringInput, method="Minkowski", p=3)
 minkowskiDistanceMatrixFull <- dist(playersAttributesFinal, method="Minkowski", p=3)
 
-# results
+# alokacja tablic wynikowych dla połączenia średniego
 result.minkowski.centroids.average <- list()
 result.minkowski.clustering.average <- list()
 result.minkowski.metrics.average <- list()
@@ -236,6 +255,7 @@ result.minkowski.compare.outfield.average <- list()
 result.minkowski.compare.general.average <- list()
 result.minkowski.compare.specific.average <- list()
 
+# alokacja tablic wynikowych dla połączenia kompletnego
 result.minkowski.centroids.complete <- list()
 result.minkowski.clustering.complete <- list()
 result.minkowski.metrics.complete <- list()
@@ -247,16 +267,18 @@ print("=========================================================================
 print("Minkowski")
 print("===========================================================================")
 
+# petle realizujące przejście algorytmów dla różnych metod połączeń i różnych wartości k przy wykorzystaniu
+# ogległości Minkowskiego
 for (m in 1:length(linkageMethods)) {
   print(paste("Method: ", linkageMethods[m]))
   print("===========================================================================")
   result <- agnes(minkowskiDistanceMatrix, diss=TRUE, method=linkageMethods[m])
   for (k in minK:maxK) {
-    # find initial clusters for sampled data.frame
+    # znalezienie początkowego grupowania w zależności od k
     clustering <- cutree(result, k=k)
     print(paste("Found ", k, "clusters"))
     
-    # find centroids of the clusters
+    # znalezienie środków wyznaczonych grup
     idx <- (clustering == 1)
     centroids <- colMeans(clusteringInput[idx,])
     for (i in 2:k) {
@@ -270,11 +292,11 @@ for (m in 1:length(linkageMethods)) {
     if (linkageMethods[m] == 'average') {
       result.minkowski.centroids.average[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.minkowski.clustering.average[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.minkowski.metrics.average[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.average[[k-minK+1]])
       result.minkowski.compare.outfield.average[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.average[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.minkowski.compare.general.average[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.average[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -285,11 +307,11 @@ for (m in 1:length(linkageMethods)) {
     } else {
       result.minkowski.centroids.complete[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.minkowski.clustering.complete[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.minkowski.metrics.complete[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.complete[[k-minK+1]])
       result.minkowski.compare.outfield.complete[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.complete[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.minkowski.compare.general.complete[[k-minK+1]] <- cluster.stats(minkowskiDistanceMatrixFull, result.minkowski.clustering.complete[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -301,9 +323,11 @@ for (m in 1:length(linkageMethods)) {
   }
 }
 
+# usuwanie zbędnych macierzy
 rm(minkowskiDistanceMatrix)
 rm(minkowskiDistanceMatrixFull)
 
+# zapis danych wynikowych w pliku .Rdata
 save(
   result.minkowski.centroids.average,
   result.minkowski.clustering.average,
@@ -325,11 +349,11 @@ save(
 
 ##########################################################################################
 
-
+# macierze odległości dla pełnego i losowo dobranego małego zbioru danych
 correlationDistanceMatrix <- dist(clusteringInput, method="correlation")
 correlationDistanceMatrixFull <- dist(playersAttributesFinal, method="correlation")
 
-# results
+# alokacja tablic wynikowych dla połączenia średniego
 result.correlation.centroids.average <- list()
 result.correlation.clustering.average <- list()
 result.correlation.metrics.average <- list()
@@ -337,6 +361,7 @@ result.correlation.compare.outfield.average <- list()
 result.correlation.compare.general.average <- list()
 result.correlation.compare.specific.average <- list()
 
+# alokacja tablic wynikowych dla połączenia kompletnego
 result.correlation.centroids.complete <- list()
 result.correlation.clustering.complete <- list()
 result.correlation.metrics.complete <- list()
@@ -348,16 +373,18 @@ print("=========================================================================
 print("Correlation")
 print("===========================================================================")
 
+# petle realizujące przejście algorytmów dla różnych metod połączeń i różnych wartości k przy wykorzystaniu
+# ogległości korelacyjnej
 for (m in 1:length(linkageMethods)) {
   print(paste("Method: ", linkageMethods[m]))
   print("===========================================================================")
   result <- agnes(correlationDistanceMatrix, diss=TRUE, method=linkageMethods[m])
   for (k in minK:maxK) {
-    # find initial clusters for sampled data.frame
+    # znalezienie początkowego grupowania w zależności od k
     clustering <- cutree(result, k=k)
     print(paste("Found ", k, "clusters"))
     
-    # find centroids of the clusters
+    # znalezienie środków wyznaczonych grup
     idx <- (clustering == 1)
     centroids <- colMeans(clusteringInput[idx,])
     for (i in 2:k) {
@@ -371,11 +398,11 @@ for (m in 1:length(linkageMethods)) {
     if (linkageMethods[m] == 'average') {
       result.correlation.centroids.average[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.correlation.clustering.average[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.correlation.metrics.average[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.average[[k-minK+1]])
       result.correlation.compare.outfield.average[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.average[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.correlation.compare.general.average[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.average[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -386,11 +413,11 @@ for (m in 1:length(linkageMethods)) {
     } else {
       result.correlation.centroids.complete[[k-minK+1]] <- centroids
       
-      # find clusters for all examples
+      # przypisanie wszystkich próbek do grup
       result.correlation.clustering.complete[[k-minK+1]] <- apply(distances, 1, which.min)
       print(paste("Found clusters for all examples, method: ", linkageMethods[m], " and k: ", k))
       
-      # find metric values 
+      # obliczenie metryk dla grupowania
       result.correlation.metrics.complete[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.complete[[k-minK+1]])
       result.correlation.compare.outfield.complete[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.complete[[k-minK+1]], alt.clustering=outfieldTrueClustering, compareonly=TRUE)
       result.correlation.compare.general.complete[[k-minK+1]] <- cluster.stats(correlationDistanceMatrixFull, result.correlation.clustering.complete[[k-minK+1]], alt.clustering=generalTrueClustering, compareonly=TRUE)
@@ -402,9 +429,11 @@ for (m in 1:length(linkageMethods)) {
   }
 }
 
+# usuwanie zbędnych macierzy
 rm(correlationDistanceMatrix)
 rm(correlationDistanceMatrixFull)
 
+# zapis danych wynikowych w pliku .Rdata
 save(
   result.correlation.centroids.average,
   result.correlation.clustering.average,
