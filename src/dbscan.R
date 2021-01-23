@@ -3,6 +3,7 @@ library(dbscan)
 source("./dataPreparation.R")
 
 # use euclidean metric for calculating distances 
+
 euclideanDistanceMatrix <- dist(playersAttributesFinal, method="Euclidean")
 
 # knee method
@@ -10,7 +11,7 @@ dbscan::kNNdistplot(euclideanDistanceMatrix, k=10)
 abline(h=3.5, lty="dashed")
 
 # conduct clustering
-cl_dbscan <- dbscan(euclideanDistanceMatrix, minPts=10, eps=3.5)
+cl_dbscan <- dbscan(euclideanDistanceMatrix, MinPts=10, eps=3.5)
 
 result.dbscan.metrics <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster)
 result.dbscan.compare.outfield <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster, alt.clustering=outfieldTrueClustering, compareonly=TRUE)
