@@ -1,14 +1,15 @@
+# Skrypt realizujący przygotowanie zbioru danych poddawanych grupowaniu. Zawiera operacje mające na celu wybór
+# najlepszego zbioru atrybutów wybranych na podstawie macierzy korelacji. 
+
 library(mltools)
 library(cluster)
 library(dplyr)
 
-# load original data from file
+# załadowanie oryginalnych danych
 playersFull <- read.csv("../data/data.csv")
 summary(playersFull)
 
-#### clear the data from unnecessary columns and rows
-
-# drop unnecessary columns
+# usunięcie ze zbioru atrybutów kolumn niepotrzebnych
 columnsToBeDropped = c("X", "ID", "Name", "Photo", "Nationality", "Flag", "Overall", 
                        "Potential", "Club", "Club.Logo", "Value", "Wage", 
                        "Special", "Real.Face", "Jersey.Number", "Joined",
@@ -19,16 +20,17 @@ columnsToBeDropped = c("X", "ID", "Name", "Photo", "Nationality", "Flag", "Overa
                        "International.Reputation")
 playersCropped <- playersFull[!(names(playersFull) %in% columnsToBeDropped)]
 
-# drop rows with missing values
+# usunięcie danych z brakującymi wartościami atrybutów
 playersCropped <- playersCropped[complete.cases(playersCropped),]
 
-#### encode categorical variables and convert data
+#### kodowanie zmiennych i konwersja danych
+
 playersEncoded <- playersCropped
 
-# binary encoding
+# kodowanie binarne
 playersEncoded$Preferred.Foot <- ifelse(playersEncoded$Preferred.Foot == "Left", 1 ,0) 
 
-# split one attribute into two
+# podział atrybutu na dwa atrybuty
 playersEncoded[c("Work.Rate.Offensive", "Work.Rate.Defensive")] <- data.frame(do.call("rbind", strsplit(as.character(playersEncoded$Work.Rate), "/ ", fixed=TRUE)))
 playersEncoded <- playersEncoded[(names(playersEncoded) != "Work.Rate")]
 
@@ -37,7 +39,7 @@ workRateLevels <- c("Low", "Medium", "High")
 playersEncoded$Work.Rate.Offensive <- as.numeric(factor(playersEncoded$Work.Rate.Offensive, levels=workRateLevels, ordered=TRUE))
 playersEncoded$Work.Rate.Defensive <- as.numeric(factor(playersEncoded$Work.Rate.Defensive, levels=workRateLevels, ordered=TRUE))
 
-# remove additional values and apply one-hot encoding
+# usunięcie nadmiarowych wartości i ujednolicenie atrybutów  
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Messi"] <- "Normal"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "C. Ronaldo"] <- "Stocky"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Neymar"] <- "Lean"
@@ -47,18 +49,19 @@ playersEncoded$Body.Type[playersEncoded$Body.Type == "Shaqiri"] <- "Stocky"
 playersEncoded$Body.Type[playersEncoded$Body.Type == "Akinfenwa"] <- "Stocky"
 playersEncoded$Body.Type <- as.numeric(factor(playersEncoded$Body.Type, levels=c("Lean", "Normal", "Stocky")))
 
-# convert height in ft to cm
+# konwersja jednostek
+# ft -> cm
 z <- data.frame(do.call("rbind", strsplit(as.character(playersEncoded$Height), "'", fixed=TRUE)))
 z <- modifyList(z, lapply(z[, sapply(z, is.factor)], function(x) as.numeric(as.character(x))))
 playersEncoded$Height <- 0.3048 * z$X1 + 0.0254 * z$X2
 
-# convert weight in lbs to kg
+# lbs -> kg
 playersEncoded$Weight <- 0.45359237 * as.numeric(strsplit(as.character(playersEncoded$Weight), "lbs"))
 
-# add BMI column
+# dodanie kolumny BMI
 playersEncoded$BMI <- playersEncoded$Weight / (playersEncoded$Height * playersEncoded$Height)
 
-#### prepare and scale attributes
+#### przygotowanie i skalowanie atrybutów
 playersNumeric <- playersEncoded
 playersNumeric$Position <- as.numeric(factor(playersNumeric$Position))
 playersPositions <- subset(playersEncoded, select=c("Position"))
@@ -66,7 +69,7 @@ playersData <- subset(playersEncoded, select=-c(Position))
 playersData <- scale(playersData)
 
 
-#### create true labels
+#### utworzenie etykiet
 positionsAsText <- data.frame(lapply(playersPositions, as.character), stringsAsFactors=FALSE)
 
 mapByOutfieldPosition <- function(x) {
@@ -93,7 +96,7 @@ outfieldTrueClustering <- apply(positionsAsText, 1, mapByOutfieldPosition)
 generalTrueClustering <- apply(positionsAsText, 1, mapByGeneralPosition)
 specificTrueClustering <- as.numeric(factor(playersNumeric$Position))
 
-#### select final set of attributes
+#### wybranie finalnego zbioru atrybutów
 playersAttributesFinal <-as.data.frame(subset(playersData, select=c("Age", "Preferred.Foot", "Weak.Foot", 
                                                       "Crossing", "LongPassing", "Reactions", 
                                                       "Balance", "Penalties", "Work.Rate.Offensive", 
