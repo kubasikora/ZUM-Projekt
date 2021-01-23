@@ -1,0 +1,132 @@
+\section{Miary}
+\label{sec:miary}
+
+\subsection{Miary niepodobieństwa}
+\label{subsec:podobienstwo}
+Wszystkie opisane wcześniej algorytmy automatycznego grupowania bazują na pewnej funkcji $d(x_{i}, x_{j})$ zwanej miarą niepodobieństwa lub odległości. Opisuje ona jak \emph{różne} są od siebie dwa przykłady $x_{i}, x_{j})$. 
+
+Najbardziej podstawową miarą niepodobieństwa jest odległość euklidesowa. Jest to pierwiastek z~sumy kwadratów różnic pomiędzy poszczególnymi atrybutami lub też długość odcinka łączącego dwa punkty. Odległość ta dana jest wzorem:
+
+\begin{equation}
+    d_{e}(x, y) = \left( \sum_{k=1}^{n} (x_k - y_k)^{2} \right)^{\frac{1}{2}}
+\end{equation}
+
+Inną interesującą miarą podobieństwa jest odległość Manhattan. Bierze ona swoją nazwę od regularnej siatki ulic w~dzielnicy Manhattan w~Nowym Yorku. Odległość dwóch punktów w tej metryce to suma wartości bezwzględnych różnic ich współrzędnych.
+
+\begin{equation}
+\label{eqn:manhattan}
+d_{manh}(x, y) = \sum_{k=1}^{n}|x_k - y_k|
+\end{equation}
+
+Ogólną wersją przedstawionych miar jest odległość Minkowskiego~\cite{irani2016clustering}. Definiowana jest poprzez następujący wzór:
+
+\begin{equation}
+    d_{mink}(x, y) = \left( \sum_{k=1}^{n} |x_k - y_k|^{p} \right)^{\frac{1}{p}}
+\end{equation}
+
+Poprzez manipulowanie parametrem $p$ możemy wpływać na to jak wartość bezwzględna  pomiędzy poszczególnymi składowymi skalarnymi, wpływa na całkowitą wartość funkcji miary. Dla $p=1$ otrzymujemy odległość Manhattan a~dla $p=2$ otrzymujemy odległość euklidesową.
+
+Z~racji weryfikowanej hipotezy, przydatna może okazać się miara niepodobieństwa, która bierze pod uwagę układ wartości wysokich i~niskich, a~nie same wielkości różnić pomiędzy składowymi. W~związku z~tym, wykorzystana zostanie odległość bazująca na korelacji dwóch wektorów. Korelacja osiąga wartość zerową dla maksymalnie niepodobnych do siebie przykładów, dlatego też miara niepodobieństwa wymaga przekształcenia do postaci:
+
+\begin{equation}
+    d_{corr}(x, y) = 1 - corr(x,y)
+\end{equation}
+
+Wszystkie rozważane miary podobieństwa zostały zaimplementowane w~pakiecie \texttt{proxy} i~można je wywołać za pomocą polecenia \texttt{dist}.
+
+\subsection{Miary jakości grupowania}
+\label{subsec:jakosc}
+Aby móc określić jak \emph{dobre} jest uzyskane przyporządkowanie do grup, należy policzyć miary jakości grupowania. Można wyróżnić dwa typy miar: zewnętrzne oraz wewnętrzne,
+
+\subsubsection{Ocena zewnętrzna}
+Miary zewnętrzne wykorzystują informację o~atrybucie ukrytym, jednak nie w~takim stopniu jak typowe miary klasyfikacji jak na przykład macierz pomyłek (i~wszystkie powiązanie z~nią wskaźniki). W~ogólności, oceniają one zgodność uzyskanego przyporządkowania z~zewnętrznym etykietowaniem. W~ramach projektu, zostaną zbadane dwa wskaźniki jakości:
+skorygowany indeks Randa oraz odległość współdzielonej informacji (ang. \emph{shared information distance}, \emph{variation of information}).
+
+Skorygowany indeks Randa jest jednym ze sposobów zmierzenia podobieństwa pomiędzy dwoma etykietowaniami. Aby otrzymać ten wskaźnik, należy w~pierwszej kolejności zbudować następującą tabele przyporządkowań: 
+
+\begin{equation*}
+\centering
+\begin{array}{c|cccc|c}
+{{} \atop X}\!\diagdown\!^Y &
+Y_1 & Y_2& \cdots& Y_s& \text{sums} \\
+\hline
+X_1 & n_{11} & n_{12} & \cdots & n_{1s} & a_1 \\
+X_2 & n_{21} & n_{22} & \cdots & n_{2s} & a_2 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+X_r & n_{r1} & n_{r2} & \cdots & n_{rs} & a_r \\
+\hline
+\text{sums} & b_1 & b_2 & \cdots & b_s &
+\end{array}
+\label{eqn:ari-table}
+\end{equation*}
+\medskip
+Na podstawie tabeli, można obliczyć wskaźnik z~następującego wzoru:
+\begin{equation*}
+    ARI = \frac{ \left. \sum_{ij} \binom{n_{ij}}{2} - \left[\sum_i \binom{a_i}{2} \sum_j \binom{b_j}{2}\right] \right/ \binom{n}{2} }{ \left. \frac{1}{2} \left[\sum_i \binom{a_i}{2} + \sum_j \binom{b_j}{2}\right] - \left[\sum_i \binom{a_i}{2} \sum_j \binom{b_j}{2}\right] \right/ \binom{n}{2} }
+    \label{eqn:ari}
+\end{equation*}
+\bigskip
+
+Odległość współdzielonej informacji opisuje odległość pomiędzy dwoma etykietowaniami, wykorzystując do tego informację wzajemną. Metryka ta zachowuje nierówność trójkąta i~dana jest wzorem:
+
+\begin{equation*}
+    VI(X, Y) = - \sum_{i,j} r_{i,j} [log(r_{i,j} / p_{i,j}) + log( r_{i,j} / q_{i,j})]
+\end{equation*}
+
+Wskaźniki te mogą dać informację jak poprawne jest nasze grupowanie, jednak do ich obliczenia potrzebna będzie informacja o~wartości atrybutu ukrytego. Wskaźniki muszą zostać obliczone trzykrotnie: raz dla analizy na podstawie gry w~polu, raz dla analizy na podstawie ogólnej pozycji i~ostatecznie trzeci raz dla analizy na podstawie szczegółowej pozycji.
+
+Do obliczenia obu wskaźników zostanie wykorzystane polecenie \texttt{cluster.stats} z~pakietu~\texttt{fpc}.
+
+\subsubsection{Ocena wewnętrzna}
+Drugim, znacznie ciekawszym, podejściem do problemu jest pominięcie wartości atrybutu ukrytego i~skupienie się na jakości wewnętrznej samego grupowania, poprzez zbadanie miar oceny wewnętrznej. Wartość danej miary jakości jest określana na podstawie samego podziału, bez dodatkowej informacji o~wartości atrybutu ukrytego. Miary tego typu skupiają się na głównie na separowalności samych grup oraz na tym jak są dobrze wewnętrznie spójne i~określone. Metryki tego typu to suma kwadratów odległości wewnątrzgrupowych, wskaźnik sylwetki, wskaźnik Calinskiego-Harabasza oraz indeks Dunna.
+
+Suma kwadratów odległości wewnątrzgrupowych jest najprostszym wskaźnikiem oceny wewnętrznej etykietowania. Aby móc obliczyć ten wskaźnik dla miar niepodobieństwa innych niż odległość euklidesowa, wykorzystana zostanie wersja ogólna wzoru:
+
+\begin{equation}
+    D = \frac{1}{2} \sum^{K}_{k=1} \sum^{n_k}_{i=1} d(x_i, \bar{x_{k}})
+\end{equation}
+
+Innym, niezwykle popularnym wskaźnikiem oceny wewnętrznej jest wskaźnik sylwetki. Mierzy on spójność przykładów w~obrębie danej grupy oraz jak dobrze jest separowalny względem innych grup. Wysoka wartość wskaźnika sylwetki informuje nas o~dobry grupowaniu. Wskaźnik ten oblicza się dla każdego badanego punktu, wykorzystując wzory:
+
+\begin{equation}
+    a(i) = \frac{1}{|C_{i}| - 1} \sum_{j \in C_{i}, i \neq j} d(i,j)
+\end{equation}
+
+\begin{equation}
+    b(i) = \min_{k \neq i} \frac{1}{|C_k|} \sum_{j \in C_{k}} d(i,j)
+\end{equation}
+
+\begin{equation}
+    s(i) = \frac{b(i) - a(i)}{max \{ a(i), b(i) \} }
+\end{equation}
+
+Aby ocenić jakość całego etykietowania a~nie przyporządkowania jednego punkty, policzony zostanie średni wskaźnik sylwetki, jako średnia arytmetyczna wskaźników dla wszystkich punktów.
+
+Wskaźnik Calinskiego-Harabasza opisuje jak dobrze dla danego etykietowania, określone i~spójne są utworzone grupy. Im wyższa wartość wskaźnika tym bardziej spójny podział. Wskaźnik ten można obliczyć ze wzoru:
+
+\begin{equation}
+    s = \frac{tr(B_{k})}{tr(W_k)} \times \frac{n_{E} - k}{k - 1}
+\end{equation}
+
+gdzie $B_{k}$ jest macierzą rozproszenia pomiędzy grupami, $W_{k}$ jest macierzą rozproszenia wewnątrzngrupowego a $n_{E}$ to liczba przykładów.
+
+Ostatnim rozważanym wskaźnikiem jest wskaźnik Dunna, dany wzorem:
+\begin{equation}
+    DI_{m} = \min_{1 \leq i \leq k} \left[ \min_{1 \leq j \leq k} \left(  \frac{\delta(X_i, X_j)}{\max_{1 \leq l \leq k} \Delta(X_l)}   \right)     \right]
+\end{equation}
+gdzie $\delta(X_i, X_j)$ równa jest odległości międzygrupowej pomiędzy $X_i$ oraz $X_j$ a $\Delta(X_l)$ równa jest sumie odległości wewnątrzgrupowych w~grupie $X_l$. Wskaźnik ten zwraca wysokie wartości dla etykietowań spójnych, kompaktowych i~dobrze separowalnych.
+
+Na podstawie miar tego typu można spróbować dobrać najlepszą ilość grup na jaką można podzielić zbiór danych. Im mniej grup, tym więcej informacji tracimy. Za duża liczba grup spowoduje nadmierne dopasowanie. 
+
+Do obliczenia wszystkich wymienionych wyżej wskaźników również zostanie wykorzystane polecenie \texttt{cluster.stats} z~pakietu~\texttt{fpc}.
+
+\subsubsection{Miary rozmyte}
+Przedstawione powyżej miary jakości, odnoszą się wyłącznie do klasycznego grupowania, w~którym danemu przykładowi, przyporządkowywana jest dana grupa. W~przypadku algorytmów grupowania rozmytego, należy zastosować specjalnie przystosowane miary, biorące pod uwagę niebinarną funkcję przynależności.
+
+W~ramach projektu, zbadany zostanie wskaźnik średniej rozmytej szerokości sylwetki~\cite{fsil}. Jest on obliczany zgodnie ze~wzorem: 
+
+\begin{equation}
+        FS = \frac{\sum_{j=1}^N ( \mu_{pj} - \mu_{qj} )^{\alpha} s_{j}} { \sum_{j=1}^N ( \mu_{pj} - \mu_{qj} }
+\end{equation}
+
+Wskaźnik ten korzysta z~parametru $\alpha$, który określa stopnie fuzyfikacji oraz z~$\mu_{pj}$,$\mu_{qj}$, które są kolejno pierwszym i~drugim największym elementem w~$j$-tej kolumnie macierzy rozmytego podziału. W~ten sposób, większy nacisk jest położony na obiekty znajdujące się blisko środka podziału, a~ignorowane są punkty znajdujące się w~obszarze nakładania się dwóch grup~\cite{fsil}. Wskaźnik ten został zaimplementowany jako funkcja \texttt{F.SIL} pakietu \texttt{fclust}~\cite{fclust}.

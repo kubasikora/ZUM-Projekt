@@ -1,0 +1,311 @@
+\section{Możliwości poprawy}
+\label{subsec:poprawa}
+
+Analizując uzyskane wyniki, doszliśmy do wniosku, że żaden z~badanych algorytmów nie poradził sobie dostatecznie z~postawionym zadaniem. W~tym celu, podjęliśmy dwie próby poprawy jakości etykietowania. W~pierwszym podejściu, ograniczyliśmy przestrzeń atrybutów, a~w~drugim zmieniliśmy podejście grupowania z~korzystającego z~niepodobieństwa, na korzystające z~gęstości przykładów.
+
+\subsection{Dalsze ograniczenie zbioru atrybutów}
+\label{subsec:dalsze-ograniczenie-liczby-atrybutow}
+
+Po przeprowadzeniu wszystkich eksperymentów na zbiorze danych z liczbą atrybutów równą $20$, postanowiliśmy zbadać wyniki grupowania przy dalszym ograniczeniu liczby atrybutów. Na podstawie macierzy korelacji ustaliliśmy ostatecznie ograniczony zbiór, składający się z czterech atrybutów:
+
+\begin{itemize}
+    \item \emph{GK.Skills} -- umiejętności bramkarskie,
+    \item \emph{Tackling} -- przejmowanie piłki,
+    \item \emph{Short.Ball.Skills} -- gra na małym obszarze,
+    \item \emph{Shooting} -- wykończenie.
+\end{itemize}
+
+Dla danych o takim zbiorze cech zostały powtórzone wszystkie wcześniej wykonywane eksperymenty.
+Na opisywanych poniżej wykresach pokazane zostaną wartości miar jakości w zależności od wynikowej liczby grup zwracanych przez algorytmy. Dla każdego eksperymentu, ponownie obliczyliśmy wszystkie wskaźniki dla wszystkich miar niepodobieństwa.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Algorytm k-medoidów}
+\label{subsec:poprawa-kmedoids}
+
+Powtórzone eksperymenty dla mniejszej liczby atrybutów przyniosły nieco inne wyniki. Rysunek \ref{fig:kmed-short-rand-gen} przedstawia wykres wskaźnika Randa w zależności od wartości $k$. Rysunek \ref{fig:kmed-short-vi-gen} z kolei przedstawia wykresy wskaźnika współdzielonej informacji.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/kmed/rand-general.pdf}
+    \caption{Wskaźnik Randa dla grupowania metodą k-medoidów dla analizy na podstawie ogólnej pozycji}
+    \label{fig:kmed-short-rand-gen}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/kmed/vi-general.pdf}
+    \caption{Wskaźnik współdzielonej informacji dla grupowania metodą k-medoidów dla analizy na podstawie ogólnej pozycji}
+    \label{fig:kmed-short-vi-gen}
+\end{figure}
+
+Można zauważyć, że najlepsze wartości wskaźnika otrzymano dla każdej z~metryk dla podziału na 3-4 grupy. W~przypadku odległości informacji współdzielonej, dla klasycznych miar odległości otrzymaliśmy podobne wyniki. Najmniejsze wartości indeks osiąga dla liczby $k=3$. Nie jest to idealny wynik, ponieważ w rozwiązaniu referencyjnym mamy cztery grupy odzwierciedlające podział na cztery ogólne pozycje.  
+
+Dla algorytmu k-medoidów wewnętrzne miary jakości przedstawione zostały na wykresach \ref{fig:kmed-short-sil}, \ref{fig:kmed-short-ch} oraz \ref{fig:kmed-short-dunn}. 
+
+Wykres średniej szerokości sylwetki znacząco różni się od swojego odpowiednika na rysunku \ref{fig:kmed-full-sil}. Wartości dla klasycznych miar odległości, podobnie jak wcześniej, maleją do pewnego poziomu, wraz ze zwiększaniem się liczby $k$. Po zmniejszeniu liczby atrybutów zupełnie inaczej wygląda wynik dla odległości korelacyjnej - uzyskujemy największe wartości wskaźnika jakości.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/kmed/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-short-sil}
+\end{figure}
+
+Na rysunku \ref{fig:kmed-short-ch} obserwujemy wartości wskaźnika Callinskiego-Harabasza. Dla klasycznych metryk, wykres wygląda podobnie jak przy wykorzystaniu pełnego zbioru atrybutów, z tą różnicą, że maksymalne wartości osiągamy dla podziału na cztery grupy. Możemy wnioskować, że uzyskaliśmy poprawę jakości grupowania. Dla miary korelacyjnej, wartość wskaźnika rośnie wraz ze wzrostem liczby grup.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/kmed/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą k-medoidów dla różnych miar niepodobieństwaą}
+    \label{fig:kmed-short-ch}
+\end{figure}
+
+Wykresy wskaźnika Dunna przedstawione na rysunku \ref{fig:kmed-short-dunn} pokazują z kolei, że najlepsze wartości wskaźnika uzyskujemy dla podziału na dwie grupy. Dla pozostałych wartości $k$ otrzymujemy bardzo niskie wyniki co świadczy o niskiej jakości grupowania.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/kmed/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-short-dunn}
+\end{figure}
+
+Zmniejszenie zbioru atrybutów pozwoliło na uzyskanie znacznie lepszych wyników, od tych otrzymanych przy wykorzystaniu pełnego zbioru atrybutów. Mniejszy zbiór atrybutów pozwolił algorytmom bazującym na mierze korelacyjnej, lepiej odnaleźć zależności pomiędzy zawodnikami, co poskutkowało polepszeniem się wskaźników jakości wewnętrznej.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Algorytm aglomeracyjny}
+\label{subsec:poprawa-agnes}
+Eksperymenty dla algorytmów aglomeracyjnych ponownie zostały przeprowadzone przy wykorzystaniu dwóch metod łączenia grup wspomnianych w \ref{subsec:hierarchical}. 
+
+\subsubsection{Połączenie kompletne}
+
+Zewnętrzne miary jakości dla połączenia kompletnego przedstawiono na wykresach \ref{fig:agnes-complete-short-rand-gen} i \ref{fig:agnes-complete-short-vi-gen}. Kolejny raz przedstawiamy wykresy miar dla analizy na podstawie ogólnej pozycji zawodnika. Wyniki otrzymane po przejściu hierarchicznego algorytmu aglomeracyjnego przedstawiają się podobnie jak dla algorytmu k-medoidów. Skorygowany indeks Randa znowu największe wartości uzyskał dla 3-4 grup wynikowych. Najgorsze wyniki otrzymaliśmy dla odległości korelacyjnej. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-complete/rand-general.pdf}
+    \caption{Wskaźnik Randa dla grupowania metodą aglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:agnes-complete-short-rand-gen}
+\end{figure}
+
+Wykres wskaźnika współdzielonej informacji nieco różni się od wykresu otrzymanego dla algorytmu k-medoidów. Wyraźnie widać, że dla klasycznych metryk znów najniższe wartości uzyskujemy dla $k=3$. Po spojrzeniu na wykres widzimy również, że najlepszy wynik otrzymaliśmy dla odległości Minkowskiego. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-complete/vi-general.pdf}
+    \caption{Wskaźnik współdzielonej informacji dla grupowania metodą aglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:agnes-complete-short-vi-gen}
+\end{figure}
+
+Wskaźnik szerokości sylwetki, przedstawiony na rysunku~\ref{fig:agnes-complete-short-sil}, prezentuje się podobne jak w~przypadku~\ref{fig:kmed-short-sil}. Najwyższe wyniki otrzymaliśmy dla odległości korelacyjnej, jednak ogólna jakość grupowania przy użyciu metryk klasycznych znów nie była najlepsza. Algorytm uzyskał najwyższe wartości wskaźnika szerokości sylwetki dla $k=2$.   
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-complete/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-short-sil}
+\end{figure}
+
+Patrząc na rysunek \ref{fig:agnes-complete-short-ch} obserwujemy wykresy wskaźnika Callinskiego-Harabasza dla grupowania otrzymanego algorytmem aglomeracyjnym. Na podstawie tego wykresu ciężko wskazać optymalną liczbę grup. Dla miar klasycznych prawdopodobnie byłaby to liczba $k=4$ (euklidesowa, Minkowski) lub $k=5$ (Manhattan). Wartość dla odległości korelacyjnej znów rośnie w miarę zwiększania się liczby grup i maksymalną wartość uzyskuje dla $k=40$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-complete/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-short-ch}
+\end{figure}
+
+Ostatnim wyliczanym wskaźnikiem jakości wewnętrznej ponownie był wskaźnik Dunna. Jego zależność od liczby grup została przedstawiona na rysunku~\ref{fig:agnes-complete-short-dunn}. Dla wszystkich czterech miar niepodobieństwa, przez niemal cały eksperyment, wartość wskaźnika Dunna utrzymuje się na stałym, bardzo niskim poziomie, co wskazuje na niską jakość grupowania. Jedyne dość wysokie wyniki otrzymano dla klasycznych miar odległości. Podobnie jak przy algorytmie k-medoidów, miara korelacyjna również osiąga najgorsze rezultaty.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-complete/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-short-dunn}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Połączenie średnie}
+
+Dla sposobu łączenia w grupy zwanego połączeniem średnim powtórzono eksperymenty, a ich wyniki przedstawiono poniżej. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-average/rand-general.pdf}
+    \caption{Wskaźnik Randa dla grupowania metodą aglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:agnes-average-short-rand-gen}
+\end{figure}
+
+Miary zewnętrzne wyliczane na podstawie wyników grupowania zostały przedstawione na rysunkach \ref{fig:agnes-average-short-rand-gen} i \ref{fig:agnes-average-short-vi-gen}. Uzyskane wyniki wskazują jednoznacznie, że algorytm aglomeracyjny z~połączeniem średnim nie poradził sobie z~grupowaniem podanych danych. Patrząc na rysunek \ref{fig:agnes-average-short-rand-gen} można stwierdzić, że optymalna liczba grup leży między $k=3$ a $k=5$. Jest to wynik poprawny zważywszy na fakt że zbiór referencyjny jest podzielony na cztery grupy. Dla takiego podziału, skorygowany wskaźnik Randa, uzyskuje zbliżone wartości dla metryk klasycznych. Miara korelacyjna, podobnie jak przy poprzednich eksperymentach, wypada najsłabiej.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-average/vi-general.pdf}
+    \caption{Wskaźnik współdzielonej informacji dla grupowania metodą aglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:agnes-average-short-vi-gen}
+\end{figure}
+
+Miara odległości współdzielonej informacji dla miary Minkowskiego osiąga wartość najmniejszą, co oznacza najlepsze dopasowanie etykietowań. Tak jak we wcześniejszych eksperymentach oraz zgodnie z~oczekiwaniami, wartość tej miary rośnie, wraz z~rosnącą liczbą grup.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-average/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą aglomeracyjną z~połaczeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-short-sil}
+\end{figure}
+
+Na rysunku~\ref{fig:agnes-average-short-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki w~zależności od zadanej liczby grup. Krzywe: niebieska, czerwona oraz zielona przedstawiają podobny, mało zadowalający przebieg. Charakterystyka krzywej odpowiadającej posiada inny charakter od reszty. Zmiana parametru $k$ sprawia że wartość oscyluje między $\num{0,4}$ a $\num{0,5}$. Ponadto dla $k$ większych od 8 miara wskaźnika dla miary korelacyjnej jest zdecydowanie większa od wskaźników dla pozostałych miar.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-average/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-short-ch}
+\end{figure}
+
+Na rysunku \ref{fig:agnes-average-short-ch} obserwujemy wartości wskaźnika Callinskiego-Harabasza. Dla wszystkich metryk niepodobieństwa, wykres wygląda podobnie jak przy wykorzystaniu połączenia kompletnego, co może wskazywać na niewrażliwość tego wskaźnika na metodę łączenia.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/agnes-average/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-short-dunn}
+\end{figure}
+
+
+W przypadku wskaźnika Dunna obserwujemy niemal identyczny wynik jak w przypadku poprzedzających algorytmów. Wartość dla miary korelacyjnej przez cały eksperyment jest bliska zeru. Dla pozostałych metryk obserwujemy niemal skokowy spadek z dość wysokich wartości praktycznie do zera przy przejściu z $k=2$ na $k=3$.  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Algorytm deglomeracyjny}
+\label{subsec:wyniki-diana}
+Na rysunku \ref{fig:diana-short-rand-gen} możemy zobaczyć, że najlepszym wynikiem indeksu Randa cechuje się podział na trzy grupy. W tym punkcie $k$ otrzymaliśmy maksymalne wartości dla każdej metryki. Dla $k>3$ znowu obserwujemy spadek wartości wskaźnika. 
+
+Wykresy wskaźnika współdzielonej informacji wyglądają bardzo podobnie do odpowiadających im wykresom przedstawianym wcześniej. W szczególności jest on podobny do wykresu otrzymanego dla algorytmu aglomeracyjnego z połączeniem kompletnym gdzie wykresy dla metryk klasycznych niemal się ze sobą pokrywały. Ponownie najlepszy wynik uzyskujemy dla odległości Minkowskiego dla $k=3$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/diana/rand-general.pdf}
+    \caption{Wskaźnik Randa dla grupowania metodą deglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:diana-short-rand-gen}
+\end{figure}
+
+Zależność wskaźnika odległości współdzielonej informacji od liczby grup z~rysunku~\ref{fig:diana-short-vi-gen}, jest bliźniacza do przedstawionych wcześniej zależności przedstawionych w~poprzedniej części sprawozdania. Z~analizy wykresu możemy wywnioskować że grupowanie przy użyciu miary korelacyjnej daje najgorsze wyniki w~kategorii miar zewnętrznych. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/diana/vi-general.pdf}
+    \caption{Wskaźnik współdzielonej informacji dla grupowania metodą deglomeracyjną dla analizy na podstawie ogólnej pozycji}
+    \label{fig:diana-short-vi-gen}
+\end{figure}
+
+Na rysunku~\ref{fig:diana-short-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki. Wskaźnik dla miar klasycznych posiada dobrze już znany, malejący przebieg. Charakterystyka krzywej odpowiadającej mierze korelacyjnej kolejny raz posiada zupełnie inny charakter od reszty. Zmiana parametru $k$ poraz kolejny nie wpływa zbytnio na wzrost czy spadek wskaźnika. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/diana/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą deglomeracyjną  dla różnych miar niepodobieństwa}
+    \label{fig:diana-short-sil}
+\end{figure}
+
+Patrząc na rysunek \ref{fig:diana-short-ch} obserwujemy wykresy wskaźnika Callinskiego-Harabasza dla algorytmu deglomeracyjnego. Na podstawie tego wykresu ciężko wskazać optymalną liczbę grup. Dla miar klasycznych prawdopodobnie byłaby to liczba z przedziału $[3,4]$. Wartość dla odległości korelacyjnej znów rośnie od początku do końca trwania eksperymentu.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/diana/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą deglomeracyjną dla różnych miar niepodobieństwa}
+    \label{fig:diana-short-ch}
+\end{figure}
+
+Tak jak przypuszczaliśmy, otrzymaliśmy ponownie mało zadowalające wykresy dla wskaźnika Dunna, który przez większość eksperymentu jest bliski zeru z wyjątkiem pierwszego przejścia algorytmu dla dwóch grup wynikowych przy wykorzystaniu miar klasycznych.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/diana/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą deglomeracyjną dla różnych miar niepodobieństwa}
+    \label{fig:diana-short-dunn}
+\end{figure}
+
+Dla obu typów algorytmów hierarchicznych, uzyskaliśmy poprawę jakości wewnętrznej uzyskanych etykietowań. Szczególny wzrost został zaobserwowany dla algorytmów bazujących na mierze korelacyjnej. Mniejsza liczba atrybutów pozwoliła na lepsze rozpoznawanie wzorców w~danych.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Algorytm FANNY}
+\label{subsec:poprawa-fanny}
+
+Porównanie wartości rozmytego średniego wskaźnika sylwetki dla różnej liczby zadanych grup zostało przedstawione na rysunku~\ref{fig:fanny-short-fsil}. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/fanny/fsil.pdf}
+    \caption{Porównanie rozmytego średniego wskaźnika sylwetki dla grupowania algorytmem FANNY dla różnych miar niepodobieństwa}
+    \label{fig:fanny-short-fsil}
+\end{figure}
+
+ Tak jak dla eksperymentu z pełnym zbiorem atrybutów, niskich wartości parametru $k$ przodują miary klasyczne, czyli: euklidesowa, manhattan oraz Minkowskiego. W końcowym etapie eksperymentu wskaźniki dla miar klasycznych mają wyraźnie oscylacyjny przebieg, co nie miało miejsca dla danych z pełnym zbiorem atrybutów. Dla większych wartości parametru $k$, miara bazująca na korelacji kolejny raz zaczyna przeważać nad pozostałymi. Zakres, w~którym miara ta przeważa nad konkurentami, odpowiada mniej więcej podziałowi \emph{na podstawie szczegółowej pozycji}. Przebieg dla tej miary ma również najspokojniejszy przebieg na przestrzeni całego eksperymentu.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Rozmyte k-średnich}
+\label{subsec:wyniki-fcm}
+
+Tak jak dla przypadku z pełnym zbiorem atrybutów, policzyliśmy tylko jeden wskaźnik - rozmyty średni wskaźnik sylwetki. Porównanie wartości tego wskaźnika dla różnej liczby zadanych grup zostało przedstawione na rysunku~\ref{fig:cmeans-short-fsil}. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/short/cmeans/fsil.pdf}
+    \caption{Porównanie rozmytego średniego wskaźnika sylwetki dla grupowania metodą fuzzy c-means dla różnych miar niepodobieństwa}
+    \label{fig:cmeans-short-fsil}
+\end{figure}
+
+Ponownie obserwujemy mocno oscylacyjny charakter przebiegów wskaźnika, wynikający z~faktu braku jawnej optymalizacji. Oscylacje jednak wydają się być mniejsze niż w przypadku eksperymentu z pełnym zbiorem atrybutów. Podobnie jak wcześniej, najwyższe wartości wskaźnika udało się uzyskać dla $k < 20$. Średnia wartość wskaźnika dla miary korelacyjnej, wskazuje na relatywnie dobrą jakość grupowania  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Automatyczny dobór liczby grup}
+\label{subsec:automatyczny-dobor}
+
+Grupowanie gęstościowe jest gałęzią algorytmów grupowania automatycznego, która jako grupy oznacza obszary w~przestrzeni atrybutów o~wysokiej gęstości przykładów. Dzięki takiemu podejściu, nie jest wymagane podawanie zadanej liczby grup \emph{a priori}. Algorytmy z~tej rodziny są w~stanie wykrywać grupy o~arbitralnym kształcie, dzięki czemu mogą wykrywać \emph{naturalne} grupy. Algorytmy te nadają się do przeprowadzenia grupowania na dużych zbiorach danych, o~których nie mamy żadnej innej wiedzy, dzięki czemu są chętnie wykorzystywane w~zagadnieniach związanych z~automatycznym odkrywaniem wiedzy. 
+
+Najbardziej podstawowym algorytmem grupowania gęstościowego jest algorytm DBSCAN (\emph{Density-Based Spatial CLustering of Applications with Noise} \cite{edami}. Algorytm wyznacza punkty rdzeniowe, czyli takie które z~zadanym promieniu sąsiedztwa $\varepsilon$, mają co najmniej $M$ sąsiadów. Punkty rdzeniowe wyznaczają grupy, do których dołączane są punkty sąsiednie oraz inne grupy. Takie podejście pozwala na utworzenie dowolnej liczby grup, a~także wyznaczenie punktów które nie należą do żadnej grupy (tzw. punkty szumu).
+
+Aby zbadać użyteczność algorytmu DBSCAN, wykorzystaliśmy ograniczony zbiór danych do $10\%$ pierwotnego zbioru, z~ograniczoną przestrzenią atrybutów do czterech (podobnie jak w~\ref{subsec:dalsze-ograniczenie-liczby-atrybutow}). W~trakcie eksperymentów zbadaliśmy przestrzeń parametrów $\varepsilon$ oraz $M$.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/dbscan/cluster.pdf}
+    \caption{Liczba wyznaczonych grup w~zależności od minimalnej liczby sąsiadów oraz maksymalnego promienia sąsiedztwa}
+    \label{fig:dbscan-cluster}
+\end{figure}
+
+Na rysunku~\ref{fig:dbscan-cluster} przedstawiona została zależność znalezionej liczby grup od maksymalnej odległości $\varepsilon$ oraz minimalnej liczby punktów $M$. Najwięcej grup zostało odkrytych dla $M = 5$ oraz dla $\varepsilon = \num{0.5}$. Niska wartość parametru $M$ ułatwia przykładom łączenie się w~grupy. Dla niskich wartości $\varepsilon$, ciężej znaleźć wymaganą liczbę sąsiadów, natomiast dla wysokich wartości $\varepsilon$ tworzone jest mniej grup ale o~większej średniej liczbie przykładów. W~patologicznych sytuacjach, wysoka średnia wielkość grupy jest spowodowana tylko jedną wyznaczoną grupą. Zjawisko to zostało przedstawione na rysunku~\ref{fig:dbscan-avgsize}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/dbscan/avgsize.pdf}
+    \caption{Średnia liczba punktów grupie w~zależności od minimalnej liczby sąsiadów oraz maksymalnego promienia sąsiedztwa}
+    \label{fig:dbscan-avgsize}
+\end{figure}
+
+Wraz z~poluzowaniem ograniczeń związanych z~minimalną liczbą sąsiadów oraz maksymalną odległością pomiędzy punktami, rośnie procent punktów które znalazły przyporządkowanie do grupy. Na~rysunku~\ref{fig:dbscan-noise} zaprezentowana została zależność pomiędzy stosunkiem zakwalifikowanych punktów do wszystkich przykładów a maksymalną odległością oraz minimalną liczbą sąsiadów. Dla $M = 5$ wartość ta rośnie od $3\%$ do $70\%$. W~przypadku rozważanego zadania grupowania zawodników, wartość ta powinna być możliwie jak największa, ponieważ w~zbiorze profesjonalnych zawodników, nie należy spodziewać się sportowców, którzy nie nadają się do gry na jakiejkolwiek pozycji.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/dbscan/noise.pdf}
+    \caption{Liczba punktów zakwalifikowanych jako szum w~zależności od minimalnej liczby sąsiadów oraz maksymalnego promienia sąsiedztwa}
+    \label{fig:dbscan-noise}
+\end{figure}
+
+Dla utworzonych etykietowań, możliwym jest wyznaczenie metryk jakości wewnętrznej, podobnie jak w~\ref{sec:wyniki} oraz~\ref{subsec:dalsze-ograniczenie-liczby-atrybutow}. Na podstawie poprzednich wykresów, wybraliśmy $M=5$ jako potencjalnie interesującą wartość parametru. W~celu doboru odpowiedniego $\varepsilon$ obliczyliśmy średnią szerokość sylwetki dla wszystkich etykietowań, która została przedstawiona na rysunku~\ref{fig:dbscan-sil}. Na podstawie wykresu, możemy wyznaczyć rozsądną maksymalną odległość równą $\num{0.375}$.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/dbscan/sil.pdf}
+    \caption{Porównanie wskaźnika średniej szerokości sylwetki dla grupowania algorytmem DBSCAN}
+    \label{fig:dbscan-sil}
+\end{figure}
+
+Przedstawiona metoda grupowania gęstościowego ma niewątpliwie swoje wady i~zalety~\cite{kryszkiewicz}. Dla wyznaczonego $M$~oraz~$\varepsilon$, wartość wskaźnika średniej szerokości sylwetki była najwyższa, co wskazuje na potencjalnie najlepiej zdefiniowane i~odseparowane grupy. Niestety, to grupowanie jest niezwykle stratne, ponieważ ponad $80\%$ została zakwalifikowana jako szum i nie została przyporządkowana do grupy.

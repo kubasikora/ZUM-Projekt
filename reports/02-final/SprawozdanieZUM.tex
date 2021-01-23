@@ -17,25 +17,47 @@
 \usepackage{indentfirst}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{float}
 \usepackage{siunitx}
 \usepackage{booktabs}
 \usepackage{subfig}
+\usepackage{pgfplots}
+\usepackage{paracol}
+\usepackage{gensymb}
+\pgfplotsset{compat=1.17}
 
 \urlstyle{same}
 	
-\title{Zaawansowane uczenie maszynowe\\ Sprawozdanie końcowe z~projektu}
+\title{Zaawansowane uczenie maszynowe\\ Sprawozdanie końcowe z projektu}
 
 \author{
 Robert Wojtaś, Jakub Sikora
 \affiliations
-numery albumów: xxxxxx, 283418 \\
+numery albumów: 283234, 283418 \\
 \emails
 robert.wojtas.stud@pw.edu.pl, jakub.sikora2.stud@pw.edu.pl
 }
 
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{TO DO:} #1}}
+\newcommand{\jsc}[1]{\textcolor{blue}{\textbf{JS:} #1}}
+\newcommand{\rwc}[1]{\textcolor{green}{\textbf{RW:} #1}}
 
 \begin{document}
 \maketitle
+
+\noindent \textbf{Temat projektu}: Grupowanie (G), \\
+\textbf{Zestaw danych}: Dane FIFA 2019 Complete Player Dataset (Kaggle) -- grupowanie lub predykcja skuteczności zawodników.
+
+
+\input{./tex/01-cel-projektu}
+\input{./tex/02-dane}
+\input{./tex/03-algorytmy-teoria}
+\input{./tex/04-miary}
+\input{./tex/05-wyniki}
+\input{./tex/06-mozliwosci-poprawy}
+\input{./tex/07-wnioski}
+
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
 
 \end{document}

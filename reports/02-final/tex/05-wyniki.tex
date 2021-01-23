@@ -1,0 +1,349 @@
+\section{Wyniki badań}
+\label{sec:wyniki}
+Do przeprowadzenia eksperymentów posłużyły napisane w języku R skrypty zawierające instrukcje i wykonujące polecenia języka~R, niezbędne do wykonania grupowania na zbiorze danych. Dla każdego algorytmu został utworzony osobny skrypt, którego wynikiem wykonania, były dane opisujące przeprowadzone przyporządkowanie do grup. 
+
+Omawiane wcześniej miary jakości grupowania obliczane były dla różnej ilości grup, zwiększanej iteracyjne w miarę postępowania eksperymentów. Grupowanie zostało przeprowadzone z~zadaną liczbą grup z~zakresu od dwóch do czterdziestu. Ilość potrzebnych uruchomień algorytmów w połączeniu z dużą ilością danych w zbiorze i kilkoma miarami odległości skutkowała bardzo długim czasem wykonania skryptów. W celu przyspieszenia wykonania eksperymentów, standardowe podejście z~wykonaniem algorytmu na całym zbiorze danych zastąpiono nieco innym postępowaniem.
+
+Ze zbioru piłkarzy wydzielono 10 procent danych. Tę część danych wykorzystano do wyznaczenia wstępnego grupowania z~wykorzystaniem danego algorytmu grupowania. Następnie wyznaczano środki otrzymanych grup. Finalne przyporządkowanie do grup otrzymywano poprzez dopasowanie elementów do wyznaczonych centroidów, wykorzystując badaną aktualnie miarę odległości.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algorytm k-medoidów}
+\label{subsec:wyniki-kmedoids}
+\emph{Kod realizujący poniżej przedstawione eksperymenty został umieszczony w~pliku \texttt{k-medoids.R}}.
+
+W~celu zbadania efektów grupowania danych przy użyciu algorytmu k-medoidów oraz doboru optymalnej liczby grup, porównaliśmy ze sobą wartości trzech wskaźników jakości dla wszystkich czterech badanych miar niepodobieństwa, a~także kształty krzywych opisujących sumę kwadratów odległości wewnątrzgrupowych. 
+
+\begin{figure}[t]
+    \centering
+    \captionsetup[subfloat]{farskip=2pt,captionskip=1pt}
+    
+    \subfloat[Miara euklidesowa]{\includegraphics[width=0.5\columnwidth]{./figures/full/kmed/ss.euclidean.pdf}}
+    \subfloat[Miara manhattan]{\includegraphics[width=0.5\columnwidth]{./figures/full/kmed/ss.manhattan.pdf}}\hfill
+    
+    \subfloat[Miara Minkowskiego]{\includegraphics[width=0.5\columnwidth]{./figures/full/kmed/ss.minkowski.pdf}}
+    \subfloat[Miara korelacyjna]{\includegraphics[width=0.5\columnwidth]{./figures/full/kmed/ss.correlation.pdf}}\hfill
+    \caption{Porównanie krzywych sumy kwadratów odległości przy grupowaniu algorytmem k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-full-ss}
+\end{figure}
+
+Na podstawie krzywych, przedstawionych na rysunku~\ref{fig:kmed-full-ss}, ciężko ocenić optymalną liczbę grup, ponieważ na pierwszy rzut oka ciężko dostrzec punkt łokciowy. Po dokładnym przyjrzeniu się można spróbować ocenić że optymalne $k$ jest bardzo niskie i~zamyka się w~przedziale $[2,3]$. 
+
+Na rysunku~\ref{fig:kmed-full-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki, w~zależności od zadanej liczby grup. Krzywe: niebieska, czerwona oraz zielona z~racji bliźniaczej natury, przedstawiają podobny, mało zadowalający przebieg. Charakterystyka krzywej odpowiadającej mierze korelacyjnej posiada zupełnie inny charakter. Zmiana parametru $k$ zdaje się wpływać na nią w~niewielkim stopniu.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-full-sil}
+\end{figure}
+
+Rysunek~\ref{fig:kmed-full-ch} przedstawia zależność wskaźnika Callinskiego-Harabasza w~zależności od liczby grup. Wraz z~rosnącą liczbą grup, wartość wskaźnika maleje. Z~racji braku górnej wartości wskaźnika, możemy jedynie stwierdzić która z~miar odległości lepiej nadaje się do tego zadania. Z~rysunku wynika, że najlepszą jakość grupowania osiągnięto dla odległości Manhattan, natomiast najgorszą dla miary korelacyjnej.
+ 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-full-ch}
+\end{figure}
+
+Ostatnim badanym wskaźnikiem jakości wewnętrznej jest wskaźnik Dunna, którego zależność od liczby grup została przedstawiona na rysunku~\ref{fig:kmed-full-dunn}. Dla wszystkich czterech miar niepodobieństwa, wartość wskaźnika Dunna utrzymuje się na stałym, bardzo niskim poziomie, co wskazuje na niską jakość grupowania.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa}
+    \label{fig:kmed-full-dunn}
+\end{figure}
+
+Uzyskane wyniki wskazują jednoznacznie, że algorytm k-medoidów nie poradził sobie z~grupowaniem podanych danych. Najlepszy uzyskany podział udało się uzyskać dla parametru $k=2$. Podział taki dobrze opisuje pierwszy sposób opisu danych, czyli \emph{na podstawie gry w~polu}. Aby sprawdzić jak dobrze uzyskane etykietowania opisują ten podział, zostanie zbadany skorygowany wskaźnik Randa, którego wartości wskaźnika zostały przedstawione na rysunku~\ref{fig:kmed-full-rand-outfield}. 
+
+Dla takiego podziału, skorygowany wskaźnik Randa, uzyskuje najwyższą wartość dla klasycznych miar Minkowskiego i~uzyskuje maksymalną możliwą wartość. Grupowanie, mimo niskiej jakości wewnętrznej, poprawnie sklasyfikowało wszystkie przykłady ze zbioru. Miara korelacyjna, podobnie jak przy miarach wewnętrznych, wypada najsłabiej, a~wartość indeksu oscyluje w~okolicach zera.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/rand-outfield.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:kmed-full-rand-outfield}
+\end{figure}
+
+Miara odległości współdzielonej informacji dla miar klasycznych osiąga wartość zerową, co oznacza stuprocentowe dopasowanie etykietowań. Zgodnie z~oczekiwaniami, wartość tej miary rośnie, wraz z~rosnącą liczbą grup. Pełna zależność dla wszystkich grup została przedstawiona na rysunku~\ref{fig:kmed-full-vi-outfield}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/vi-outfield.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:kmed-full-vi-outfield}
+\end{figure}
+
+Dla innych podziałów, jakość grupowania nie jest już tak zadowalająca. Na rysunku~\ref{fig:kmed-full-rand-specific} przedstawiono zależność skorygowanego indeksu Randa od liczby grup przy podziale na podstawie szczegółowej pozycji. Miary klasyczne osiągają swoje niewielkie maksimum pomiędzy $10$ a $14$ grupami, wstrzeliwując się w~oczekiwaną liczbę etykietowań. Zastanawiająca jest charakterystyka indeksu przy zastosowaniu miary korelacyjnej. Najwyższą wartość osiąga on dla $32$ grup, a~następnie drastycznie spada, co odpowiada spadkowi na wykresie~\ref{fig:kmed-full-sil}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/kmed/rand-specific.pdf}
+    \caption{Porównanie odległości współdzielonej informacji dla grupowania metodą k-medoidów dla różnych miar niepodobieństwa przy podziale na podstawie szczegółowej pozycji}
+    \label{fig:kmed-full-rand-specific}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algorytm aglomeracyjny}
+\label{subsec:wyniki-agnes}
+\emph{Kod realizujący poniżej przedstawione eksperymenty został umieszczony w~pliku \texttt{agnes-clustering.R}}.
+
+Algorytm aglomeracyjny pozwala na utworzenie hierarchii połączeń pomiędzy grupowanymi przykładami, dzięki czemu możliwym jest uzyskanie dowolnej liczby grup: od jednej grupy zawierającej wszystkie przykłady ze zbioru, po $n$ grup, z~których każda ma tylko jeden przykład. W~ramach eksperymentów, przeprowadziliśmy grupowanie za pomocą polecenia \texttt{agnes} a~następnie podzieliliśmy wynik ze względu na zadaną liczbę grup poleceniem \texttt{cutree}. W~celu zbadania jakości etykietowania oraz doboru optymalnej liczby grup, ponownie porównaliśmy ze sobą wartości trzech wskaźników jakości dla wszystkich czterech badanych miar niepodobieństwa, a~także kształty krzywych opisujących sumę kwadratów odległości wewnątrzgrupowych. Dodatkowo, zbadaliśmy różnicę pomiędzy metodą łączenia przykładów. W~ramach projektu, skorzystaliśmy z~połączenia kompletnego oraz średniego.
+
+\subsubsection{Połączenie kompletne}
+
+\begin{figure}[h]
+    \centering
+    \captionsetup[subfloat]{farskip=2pt,captionskip=1pt}
+    
+    \subfloat[Miara euklidesowa]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-complete/ss.euclidean.pdf}}
+    \subfloat[Miara Manhattan \label{fig:agnes-complete-full-ss-manhattan}]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-complete/ss.manhattan.pdf}}\hfill
+    
+    \subfloat[Miara Minkowskiego]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-complete/ss.minkowski.pdf}}
+    \subfloat[Miara korelacyjna \label{fig:agnes-complete-full-ss-correlation}]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-complete/ss.correlation.pdf}}\hfill
+    \caption{Porównanie krzywych sumy kwadratów odległości przy grupowaniu algorytmem aglomeracyjnym z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-full-ss}
+\end{figure}
+
+Na podstawie krzywych, przedstawionych na rysunku~\ref{fig:agnes-complete-full-ss}, można spróbować dokonać estymacji optymalnej liczby grup. Korzystając z~rysunków~\ref{fig:agnes-complete-full-ss-manhattan} oraz \ref{fig:agnes-complete-full-ss-correlation} wnioskujemy, iż optymalna liczba grup wynosi od $2$ do $5$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-full-sil}
+\end{figure}
+
+Na rysunku~\ref{fig:agnes-complete-full-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki w~zależności od zadanej liczby grup. Krzywe: niebieska, czerwona oraz zielona przedstawiają podobny, mało zadowalający przebieg, przy czym miara Manhattan wydaje się być najbardziej odporna na zwiększanie liczby grup. Charakterystyka krzywej odpowiadającej mierze korelacyjnej ponownie posiada zupełnie inny charakter od reszty. Zmiana parametru $k$ zdaje się wpływać na nią w~niewielkim stopniu.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-full-ch}
+\end{figure}
+
+Rysunek~\ref{fig:agnes-complete-full-ch} przedstawia zależność wskaźnika Callinskiego-Harabasza w~zależności od liczby grup. Wraz z~rosnącą liczbą grup, wartość wskaźnika maleje.  Z~rysunku wynika również, że najlepszą jakość grupowania osiągnięto dla odległości Manhattan, natomiast najgorszą dla miary korelacyjnej.
+ 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa}
+    \label{fig:agnes-complete-full-dunn}
+\end{figure}
+
+Ostatnim badanym wskaźnikiem jakości wewnętrznej jest wskaźnik Dunna, którego zależność od liczby grup została przedstawiona na rysunku~\ref{fig:agnes-complete-full-dunn}. Dla wszystkich czterech miar niepodobieństwa, wartość wskaźnika Dunna utrzymuje się na stałym, bardzo niskim poziomie, co wskazuje na niską jakość grupowania. Podobnie jak przy algorytmie k-medoidów, miara korelacyjna również osiąga najgorsze rezultaty.
+
+Uzyskane wyniki wskazują jednoznacznie, że algorytm aglomeracyjny z~połączeniem kompletnym nie poradził sobie z~grupowaniem podanych danych. Najlepszy uzyskany podział udało się uzyskać dla parametru $k=2$. Podział taki dobrze opisuje pierwszy sposób opisu danych, czyli \emph{na podstawie gry w~polu}. Aby sprawdzić jak dobrze uzyskane etykietowania opisują ten podział, zostanie zbadany skorygowany wskaźnik Randa, którego wartości wskaźnika zostały przedstawione na rysunku~\ref{fig:agnes-complete-full-rand-outfield}. 
+
+Dla takiego podziału, skorygowany wskaźnik Randa, uzyskuje najwyższą wartość dla miary Manhattan, która również przejawiała dobre wyniki przy ocenie wewnętrznej. Dla tej miary, grupowanie, mimo niskiej jakości wewnętrznej, poprawnie sklasyfikowało wszystkie przykłady ze zbioru. Miara korelacyjna, podobnie jak przy miarach wewnętrznych, wypada najsłabiej, a~wartość indeksu oscyluje w~okolicach zera. Zastanawiający jest bardzo niski wynik etykietowania bazującego na odległości Minkowskiego.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/rand-outfield.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:agnes-complete-full-rand-outfield}
+\end{figure}
+
+Miara odległości współdzielonej informacji dla miary Manhattan osiąga wartość zerową, co oznacza stuprocentowe dopasowanie etykietowań. Zgodnie z~oczekiwaniami, wartość tej miary rośnie, wraz z~rosnącą liczbą grup. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/vi-outfield.pdf}
+    \caption{Porównanie odległości współdzielonej informacji dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:agnes-complete-full-vi-outfield}
+\end{figure}
+
+Dla innych podziałów, jakość grupowania nie jest już tak zadowalająca. Na rysunku~\ref{fig:agnes-complete-full-rand-general} przedstawiono zależność skorygowanego indeksu Randa od liczby grup przy podziale na podstawie ogólnej pozycji. Miary klasyczne osiągają swoje niewielkie maksimum dla 4 grup, dobrze opisując oczekiwaną liczbę etykietowań. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-complete/rand-general.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą aglomeracyjną z~połączeniem kompletnym dla różnych miar niepodobieństwa przy podziale na podstawie ogólnej pozycji}
+    \label{fig:agnes-complete-full-rand-general}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Połączenie średnie}
+\begin{figure}[h]
+    \centering
+    \captionsetup[subfloat]{farskip=2pt,captionskip=1pt}
+    
+    \subfloat[Miara euklidesowa]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-average/ss.euclidean.pdf}}
+    \subfloat[Miara manhattan \label{fig:agnes-average-full-ss-manhattan}]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-average/ss.manhattan.pdf}}\hfill
+    
+    \subfloat[Miara Minkowskiego]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-average/ss.minkowski.pdf}}
+    \subfloat[Miara korelacyjna \label{fig:agnes-average-full-ss-correlation}]{\includegraphics[width=0.5\columnwidth]{./figures/full/agnes-average/ss.correlation.pdf}}\hfill
+    \caption{Porównanie krzywych sumy kwadratów odległości przy grupowaniu algorytmem aglomeracyjnym z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-full-ss}
+\end{figure}
+
+Na podstawie krzywych, przedstawionych na rysunku~\ref{fig:agnes-average-full-ss}, nie sposób jednoznacznie estymować optymalną liczbę grup. Z~racji zastosowanej metody łączenia, obliczone krzywe nie posiadają gładkiego charakteru, co zdecydowanie utrudnia ich analizę.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-full-sil}
+\end{figure}
+
+Na rysunku~\ref{fig:agnes-average-full-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki w~zależności od  liczby grup. Krzywe: niebieska, czerwona oraz zielona przedstawiają podobny, mało zadowalający przebieg. Charakterystyka krzywej odpowiadającej mierze korelacyjnej ponownie posiada zupełnie inny charakter od reszty. Dla $k > 13$ wskaźnik jest większy od wszystkich pozostałych. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-full-ch}
+\end{figure}
+
+Rysunek~\ref{fig:agnes-average-full-ch} przedstawia zależność wskaźnika Callinskiego- Harabasza od liczby grup. Wraz z~rosnącą liczbą grup, wartość wskaźnika maleje. Najlepszą jakość grupowania osiągnięto dla odległości Manhattan, natomiast najgorszą dla miary korelacyjnej. Grupowanie przy użyciu miary Manhattan reaguje na podział \emph{ze względu na szczegółową pozycję}, na co wskazuje niewielki wzrost wskaźnika dla $k = 12$.
+ 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa}
+    \label{fig:agnes-average-full-dunn}
+\end{figure}
+
+Ostatnim badanym wskaźnikiem jakości wewnętrznej jest wskaźnik Dunna, którego zależność od liczby grup została przedstawiona na rysunku~\ref{fig:agnes-average-full-dunn}. Dla wszystkich czterech miar niepodobieństwa, wartość wskaźnika Dunna utrzymuje się na stałym, bardzo niskim poziomie, co wskazuje na niską jakość grupowania. Podobnie jak przy poprzednim sposobie łączenia, miara korelacyjna również osiąga najgorsze rezultaty.
+
+Uzyskane wyniki wskazują jednoznacznie, że algorytm aglomeracyjny zarówno z~połączeniem kompletnym jak i~średnim, nie poradził sobie z~grupowaniem podanych danych. Najlepszy uzyskany podział udało się uzyskać dla parametru $k=2$. Podział taki dobrze opisuje pierwszy sposób opisu danych, czyli \emph{na podstawie gry w~polu}. Aby potwierdzić tą hipotezę, w~następnej kolejności zbadane zostały miary oceny zewnętrznej.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/rand-outfield.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:agnes-average-full-rand-outfield}
+\end{figure}
+
+
+Aby sprawdzić jak dobrze uzyskane etykietowania opisują ten podział, zostanie zbadany skorygowany wskaźnik Randa, którego wartości wskaźnika zostały przedstawione na rysunku~\ref{fig:agnes-average-full-rand-outfield}. Dla takiego podziału, skorygowany wskaźnik Randa, uzyskuje najwyższą wartość dla miary bazującej na odległości Minkowskiego. Miara korelacyjna, podobnie jak przy miarach wewnętrznych, wypada najsłabiej, a~wartość indeksu oscyluje w~okolicach zera, osiągając dla $k < 3$ wartości ujemne, świadczące o~zupełnie niepoprawnym grupowaniu. 
+
+
+Miara odległości współdzielonej informacji dla miary Minkowskiego osiąga wartość zerową, co oznacza stuprocentowe dopasowanie etykietowań. Zgodnie z~oczekiwaniami, wartość tej miary rośnie, wraz z~rosnącą liczbą grup. Pełna zależność dla wszystkich grup została przedstawiona na rysunku~\ref{fig:agnes-average-full-vi-outfield}. Rysunek ten dobrze ukazuje przepaść pomiędzy klasycznymi miarami a~miarą korelacyjną.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/vi-outfield.pdf}
+    \caption{Porównanie odległości współdzielonej informacji dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:agnes-average-full-vi-outfield}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/agnes-average/rand-general.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania metodą aglomeracyjną z~połączeniem średnim dla różnych miar niepodobieństwa przy podziale na podstawie ogólnej pozycji}
+    \label{fig:agnes-average-full-rand-general}
+\end{figure}
+
+
+Dla innych podziałów, jakość grupowania nie jest już tak zadowalająca. Na rysunku~\ref{fig:agnes-average-full-rand-general} przedstawiono zależność skorygowanego indeksu Randa od liczby grup przy podziale na podstawie ogólnej pozycji. Miary klasyczne maleją wraz z~rosnącą liczbą grup, natomiast miara korelacyjna szybko wzrasta po przekroczeniu $k > 6$ i~utrzymuje względnie stałą wartość.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algorytm deglomeracyjny}
+\label{subsec:wyniki-diana}
+\emph{Kod realizujący poniżej przedstawione eksperymenty został umieszczony w~pliku \texttt{diana-clustering.R}}.
+
+Algorytm deglomeracyjny działa na podobnej zasadzie jak omawiany wcześniej algorytm deglomeracyjny. W~wyniku jego działania, również tworzona jest hierarchia przykładów, którą w~dalszej kolejności można dowolnie podzielić, otrzymując zadaną liczbę grup. W~przypadku tego algorytmu, nie ma potrzeby definiowania metody łączenia przykładów, ponieważ punktem startowym jest grupa zawierająca wszystkie przykłady, która następnie jest dzielona na podgrupy.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup[subfloat]{farskip=2pt,captionskip=1pt}
+    
+    \subfloat[Miara euklidesowa  \label{fig:diana-full-ss-euclidean}]{\includegraphics[width=0.5\columnwidth]{./figures/full/diana/ss.euclidean.pdf}}
+    \subfloat[Miara manhattan \label{fig:diana-full-ss-manhattan}]{\includegraphics[width=0.5\columnwidth]{./figures/full/diana/ss.manhattan.pdf}}\hfill
+    
+    \subfloat[Miara Minkowskiego]{\includegraphics[width=0.5\columnwidth]{./figures/full/diana/ss.minkowski.pdf}}
+    \subfloat[Miara korelacyjna \label{fig:diana-full-ss-correlation}]{\includegraphics[width=0.5\columnwidth]{./figures/full/diana/ss.correlation.pdf}}\hfill
+    \caption{Porównanie krzywych sumy kwadratów odległości przy grupowaniu algorytmem deglomeracyjnym dla różnych miar niepodobieństwa}
+    \label{fig:diana-full-ss}
+\end{figure}
+
+Na podstawie krzywych, przedstawionych na rysunku~\ref{fig:diana-full-ss}, można spróbować dokonać estymacji optymalnej liczby grup. Korzystając z~rysunków~\ref{fig:diana-full-ss-euclidean} oraz \ref{fig:diana-full-ss-manhattan} wnioskujemy, iż optymalna liczba grup wynosi od $2$ do $8$.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/diana/sil.widths.pdf}
+    \caption{Porównanie średniej szerokości sylwetki dla grupowania algorytmem deglomeracyjnym dla różnych miar niepodobieństwa}
+    \label{fig:diana-full-sil}
+\end{figure}
+
+Na rysunku~\ref{fig:diana-full-sil} porównane zostały przebiegi wartości średniej szerokości sylwetki w~zależności od zadanej liczby grup. Krzywe: niebieska, czerwona oraz zielona przedstawiają podobny przebieg. Najwyższą wartość uzyskują dla $k=2$, jednak dla $k < 15$, utrzymuje się dużo większa wartość niż dla pozostałych etykietowań. Charakterystyka krzywej odpowiadającej mierze korelacyjnej ponownie posiada zupełnie inny charakter od reszty. Dla $k > 15$, miara ta uzyskuje najlepsze wartości z~wszystkich pozostałych.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/diana/ch.pdf}
+    \caption{Porównanie wskaźnika Callinskiego-Harabasza dla grupowania algorytmem deglomeracyjnym dla różnych miar niepodobieństwa}
+    \label{fig:diana-full-ch}
+\end{figure}
+
+Rysunek~\ref{fig:diana-full-ch} przedstawia zależność wskaźnika Callinskiego-Harabasza w~zależności od liczby grup. Wraz z~rosnącą liczbą grup, wartość wskaźnika maleje.  Z~rysunku wynika również, że najlepszą jakość grupowania osiągnięto dla miary bazującej na odległości Manhattan, natomiast najgorszą dla miary korelacyjnej.
+ 
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/diana/dunn.pdf}
+    \caption{Porównanie wskaźnika Dunna dla grupowania algorytmem deglomeracyjnym dla różnych miar niepodobieństwa}
+    \label{fig:diana-full-dunn}
+\end{figure}
+
+Ostatnim badanym wskaźnikiem jakości wewnętrznej jest wskaźnik Dunna, którego zależność od liczby grup została przedstawiona na rysunku~\ref{fig:diana-full-dunn}. Dla wszystkich czterech miar niepodobieństwa, wartość wskaźnika Dunna utrzymuje się na stałym, bardzo niskim poziomie, co wskazuje na niską jakość grupowania. Podobnie jak we wcześniejszych przypadkach, miara korelacyjna również osiąga najgorsze rezultaty.
+
+Uzyskane wyniki wskazują jednoznacznie, że algorytm deglomeracyjny również nie poradził sobie z~grupowaniem podanych danych. Najlepszy uzyskany podział udało się uzyskać dla parametru $k=2$. Podział taki dobrze opisuje pierwszy sposób opisu danych, czyli \emph{na podstawie gry w~polu}. Aby sprawdzić jak dobrze uzyskane etykietowania opisują ten podział, zostanie zbadany skorygowany wskaźnik Randa, którego wartości wskaźnika zostały przedstawione na rysunku~\ref{fig:diana-full-rand-outfield}. 
+
+Dla takiego podziału, skorygowany wskaźnik Randa, uzyskuje najwyższą wartość dla miar klasycznych. Dla tych miar, grupowanie, mimo niskiej jakości wewnętrznej, poprawnie sklasyfikowało wszystkie przykłady ze zbioru. Miara korelacyjna, podobnie jak przy miarach wewnętrznych, wypada najsłabiej, a~wartość indeksu oscyluje w~okolicach zera.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/diana/rand-outfield.pdf}
+    \caption{Porównanie skorygowanego wskaźnika Randa dla grupowania algorytmem deglomeracyjnym dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:diana-full-rand-outfield}
+\end{figure}
+
+Miara odległości współdzielonej informacji dla miary Manhattan osiąga wartość zerową, co oznacza stuprocentowe dopasowanie etykietowań. Zgodnie z~oczekiwaniami, wartość tej miary rośnie, wraz z~rosnącą liczbą grup. Pełna zależność dla wszystkich grup została przedstawiona na rysunku~\ref{fig:diana-full-vi-outfield}.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/diana/vi-outfield.pdf}
+    \caption{Porównanie odległości współdzielonej informacji dla grupowania algorytmem deglomeracyjnym dla różnych miar niepodobieństwa przy podziale na podstawie gry w~polu}
+    \label{fig:diana-full-vi-outfield}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Algorytm FANNY}
+\label{subsec:wyniki-fanny}
+\emph{Kod realizujący poniżej przedstawione eksperymenty został umieszczony w~pliku \texttt{fanny-clustering.R}}.
+
+Dla grupowań rozmytego algorytmem FANNY, zdecydowaliśmy się na policzenie tylko jednego wskaźnika, którym jest rozmyty średni wskaźnik sylwetki. Porównanie wartości tego wskaźnika dla różnej liczby zadanych grup zostało przedstawione na rysunku~\ref{fig:fanny-full-fsil}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/fanny/fsil.pdf}
+    \caption{Porównanie rozmytego średniego wskaźnika sylwetki dla grupowania algorytmem FANNY dla różnych miar niepodobieństwa}
+    \label{fig:fanny-full-fsil}
+\end{figure}
+
+Na podstawie rysunku, możliwym jest określenie która z~miar niepodobieństwa jest najlepsza do danego zadania. Dla niskich wartości parametru $k$ przodują miary klasyczne, czyli: euklidesowa, Manhattan oraz Minkowskiego. Dzieje się tak ponieważ dla podziału \emph{na podstawie gry w~polu}, rozmycie funkcji przynależności jest niewielkie. Dla większych wartości parametru $k$, miara bazująca na korelacji zaczyna przeważać nad pozostałymi. Zakres, w~którym miara ta przeważa nad konkurentami, odpowiada mniej więcej podziałowi \emph{na podstawie szczegółowej pozycji}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Rozmyte k-średnich}
+\label{subsec:wyniki-fcm}
+\emph{Kod realizujący poniżej przedstawione eksperymenty został umieszczony w~pliku \texttt{cmeans-clustering.R}}.
+
+Dla grupowania algorytmem rozmytych k-średnich, ponownie zdecydowaliśmy się na policzenie tylko jednego wskaźnika, którym jest rozmyty wskaźnik średniej sylwetki. Porównanie wartości tego wskaźnika dla różnej liczby zadanych grup zostało przedstawione na rysunku~\ref{fig:fanny-full-fsil}. 
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1.1\columnwidth]{./figures/full/cmeans/fsil.pdf}
+    \caption{Porównanie rozmytego średniego wskaźnika sylwetki dla grupowania metodą rozmytych k-średnich dla różnych miar niepodobieństwa}
+    \label{fig:fanny-full-fsil}
+\end{figure}
+
+W~przeciwieństwie do algorytmu FANNY, rozmyty wskaźnik średniej sylwetki dla algorytmu rozmytych k-średnich ma mocno oscylacyjny charakter, który wynika z~faktu braku jawnej optymalizacji wskaźnika jakości, jak to się dzieje w~przypadku poprzedniego algorytmu. W~ogólności, najwyższe wartości tego wskaźnika udało się uzyskać dla $k < 20$, które zgrubnie można przyporządkować granicy zasadności stosowania podziału \emph{na podstawie szczegółowej pozycji}.
