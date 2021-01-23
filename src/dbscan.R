@@ -1,36 +1,44 @@
 library(dbscan)
+library(fpc)
+source("./data-preparation.R")
+source("./smaller-attributes-prep.R")
 
-source("./dataPreparation.R")
+SAMPLE_RATIO <- 0.1
+clusteringInput <- slice_sample(playersAttributesFinal, prop=SAMPLE_RATIO)
+summary(clusteringInput)
 
-# use euclidean metric for calculating distances 
-
-euclideanDistanceMatrix <- dist(playersAttributesFinal, method="Euclidean")
+correlationDistanceMatrix <- dist(clusteringInput, method="correlation")
 
 # knee method
-dbscan::kNNdistplot(euclideanDistanceMatrix, k=10)
-abline(h=3.5, lty="dashed")
 
+cl_dbscan <- list()
+pts <- list()
+epsilons <- list()
+result.dbscan.metrics <- list()
+result.dbscan.compare.outfield <- list()
+result.dbscan.compare.general <- list()
+result.dbscan.compare.specific <- list()
+
+counter = 1
 # conduct clustering
-cl_dbscan <- dbscan(euclideanDistanceMatrix, MinPts=10, eps=3.5)
+for(p in c(5, 10, 15, 20, 25)){
+  for(epsilon in c(0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875)){
+  print(c(p, epsilon))
+  cl <- fpc::dbscan(correlationDistanceMatrix, MinPts=p, eps=epsilon)
+  cl$cluster <- replace(cl$cluster, cl$cluster == 0, 10000)
+  cl_dbscan[[counter]] <- cl
+  pts[[counter]] <- p
+  epsilons[[counter]] <- epsilon
+  
+  print("stats")
+  if(length(unique(cl$cluster)) == 1){
+    print("no clusters detected")
+    result.dbscan.metrics[[counter]] <- NULL
+  } else {
+    result.dbscan.metrics[[counter]] <- cluster.stats(correlationDistanceMatrix, noisecluster = TRUE, cl$cluster)
+  }
+  counter <- counter + 1
+  }
+}
 
-result.dbscan.metrics <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster)
-result.dbscan.compare.outfield <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster, alt.clustering=outfieldTrueClustering, compareonly=TRUE)
-result.dbscan.compare.general <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster, alt.clustering=generalTrueClustering, compareonly=TRUE)
-result.dbscan.compare.specific <- cluster.stats(euclideanDistanceMatrix, cl_dbscan$cluster, alt.clustering=specificTrueClustering, compareonly=TRUE)
-
-result.dbscan.metrics$avg.silwidth
-
-result.dbscan.metrics$within.cluster.ss
-
-result.dbscan.compare.outfield$corrected.rand
-result.dbscan.compare.general$corrected.rand
-result.dbscan.compare.specific$corrected.rand
-
-save(
-  cl_dbscan,
-  result.dbscan.metrics,
-  result.dbscan.compare.outfield,
-  result.dbscan.compare.general,
-  result.dbscan.compare.specific, 
-  file="../results/dbscan-results.RData"
-)
+save(cl_dbscan, result.dbscan.metrics, file="./dbscan-results.RData")
